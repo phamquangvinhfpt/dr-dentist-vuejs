@@ -52,7 +52,7 @@ jobs:
         REMOTE_HOST: ${{ secrets.SSH_HOST }}
         REMOTE_USER: ${{ secrets.SSH_USER }}
         TARGET: ${{ secrets.SSH_PATH_TEST }}
-        SCRIPT_AFTER: "echo 'Clearing test environment'; chmod +x /root/clear-dr-dentist-test.sh; /root/clear-dr-dentist-test.sh; echo 'Deployed to test.'"
+        SCRIPT_BEFORE: "echo 'Clearing test environment'; chmod +x /root/clear-dr-dentist-test.sh; /root/clear-dr-dentist-test.sh; echo 'Deployed to test.'"
       if: github.ref == 'refs/heads/dev'
 
   deploy-prod:
@@ -72,5 +72,5 @@ jobs:
         REMOTE_HOST: ${{ secrets.SSH_HOST }}
         REMOTE_USER: ${{ secrets.SSH_USER }}
         TARGET: ${{ secrets.SSH_PATH_PROD }}
-        SCRIPT_AFTER: "echo 'Clearing test environment'; chmod +x /root/clear-dr-dentist-prod.sh; /root/clear-dr-dentist-prod.sh; echo 'Deployed to production.'"
+        SCRIPT_BEFORE: "echo 'Clearing test environment'; chmod +x /root/clear-dr-dentist-prod.sh; /root/clear-dr-dentist-prod.sh; echo 'Deployed to production.'"
       if: github.ref == 'refs/heads/main'
