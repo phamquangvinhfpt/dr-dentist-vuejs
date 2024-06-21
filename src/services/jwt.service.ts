@@ -3,7 +3,6 @@ class JwtService {
   private REFRESH_TOKEN = 'refresh_token'
   private REFRESH_TOKEN_EXPIRES = 'refresh_token_expires'
   private USER = 'user'
-  private TENANT = 'tenant'
 
   getToken(): string | null {
     return window.localStorage.getItem(this.USER_TOKEN_KEY)
@@ -18,9 +17,9 @@ class JwtService {
   }
 
   saveToken(data: any): void {
-    window.localStorage.setItem(this.USER_TOKEN_KEY, data.token)
-    window.localStorage.setItem(this.REFRESH_TOKEN, data.refreshToken)
-    window.localStorage.setItem(this.REFRESH_TOKEN_EXPIRES, data.refreshTokenExpiryTime)
+    window.localStorage.setItem(this.USER_TOKEN_KEY, data.token.accessToken)
+    window.localStorage.setItem(this.REFRESH_TOKEN, data.token.refreshToken)
+    window.localStorage.setItem(this.REFRESH_TOKEN_EXPIRES, data.expires)
   }
 
   destroyToken(): void {
@@ -50,14 +49,6 @@ class JwtService {
     window.localStorage.removeItem(this.USER)
   }
 
-  saveTenant(tenant: string): void {
-    window.localStorage.setItem(this.TENANT, tenant)
-  }
-
-  getTenant(): string | null {
-    return window.localStorage.getItem(this.TENANT)
-  }
-
   getAuthHeader(): string {
     return `Bearer ${this.getToken()}`
   }
@@ -81,6 +72,15 @@ class JwtService {
         .join(''),
     )
     return JSON.parse(jsonPayload)
+  }
+
+  getTokenExpiryTime(): number {
+    const token = this.getToken()
+    if (!token) {
+      return 0
+    }
+    const tokenData = this.parseToken(token)
+    return tokenData.exp
   }
 
   parseTokenLocal(): any {

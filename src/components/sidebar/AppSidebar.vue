@@ -59,7 +59,7 @@ import { useColors } from 'vuestic-ui'
 
 import navigationRoutes, { type INavigationRoute } from './NavigationRoutes'
 
-import { useAuthStore } from '../../stores/modules/auth.module'
+// import { useAuthStore } from '../../stores/modules/auth.module'
 
 export default defineComponent({
   name: 'Sidebar',
@@ -72,7 +72,7 @@ export default defineComponent({
   setup: (props, { emit }) => {
     const { getColor, colorToRgba } = useColors()
     const route = useRoute()
-    const authStore = useAuthStore()
+    // const authStore = useAuthStore()
     const { t } = useI18n()
 
     const value = ref<boolean[]>([])
@@ -97,7 +97,7 @@ export default defineComponent({
         return true
       }
       if (route.meta.permission) {
-        return authStore.hasAccess(route.meta.permission)
+        return true
       }
       return true
     }

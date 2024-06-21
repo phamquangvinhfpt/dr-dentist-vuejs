@@ -75,12 +75,29 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/auth/RecoverPassword.vue'),
       },
       {
+        name: 'confirm-email',
+        path: 'confirm-email',
+        meta: {
+          requiresAuth: false,
+        },
+        component: () => import('../pages/auth/ConfirmEmail.vue'),
+      },
+      {
         name: 'recover-password-email',
         path: 'recover-password-email',
         meta: {
           requiresAuth: false,
         },
         component: () => import('../pages/auth/CheckTheEmail.vue'),
+      },
+      {
+        name: 'reset-password',
+        path: 'reset-password',
+        meta: {
+          requiresAuth: false,
+          requiresCaptcha: true,
+        },
+        component: () => import('../pages/auth/ResetPassword.vue'),
       },
       {
         path: '',

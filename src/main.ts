@@ -26,6 +26,9 @@ router.beforeEach((to, from, next) => {
       next()
     }
   } else {
+    if (authStore.isAuthenticated) {
+      next({ name: 'dashboard' })
+    }
     next()
   }
 })

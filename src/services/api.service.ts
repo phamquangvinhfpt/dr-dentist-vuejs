@@ -1,20 +1,80 @@
 import axios from 'axios'
 import JwtService from '@services/jwt.service'
-
-JwtService.saveTenant('root')
+import { useAuthStore } from '@/stores/modules/auth.module'
+import { useToast } from 'vuestic-ui'
+import router from '@/router'
 
 class ApiService {
-  private api_url = 'http://localhost:5000/api'
+  private api_url =  import.meta.env.VITE_APP_BASE_URL as string
 
-  private axios = axios.create({
+  public axios = axios.create({
     baseURL: this.api_url,
+    headers: {
+      'x-from-host': location.host,
+    },
   })
+
+  constructor() {
+    this.axios.interceptors.request.use(
+      async function (config) {
+        if (config.url !== '/Auth/RefreshToken' && config.url !== '/Auth/Authenticate') {
+          // config.headers.Authorization = JwtService.getAuthHeader()
+          console.log('c')
+          const tokenExpiryTime = JwtService.getTokenExpiryTime()
+          console.log('tokenExpiryTime', tokenExpiryTime)
+          const token = JwtService.getToken()
+
+          if (tokenExpiryTime && token) {
+            // convert milliseconds to seconds
+            const currentTime = Date.now() / 1000
+            const expiryTime = new Date(tokenExpiryTime).getTime()
+            if (currentTime > expiryTime) {
+              const refreshTokenExpiryTime = JwtService.getRefreshTokenExpiryTime()
+              const refreshToken = JwtService.getRefreshToken()
+              if (refreshTokenExpiryTime && refreshToken) {
+                const currentTime = Date.now()
+                const expiryTime = new Date(refreshTokenExpiryTime).getTime()
+                if (currentTime < expiryTime) {
+                  const store = useAuthStore()
+                  const token = await store.refreshToken()
+                  config.headers.Authorization = `Bearer ${token}`
+                }
+              }
+            }
+          }
+        }
+        return config
+      },
+      function (error) {
+        return Promise.reject(error)
+      },
+    )
+
+    this.axios.interceptors.response.use(
+      function (response) {
+        return response
+      },
+      function (error) {
+        if (error.response.status === 401) {
+          JwtService.destroyToken()
+          JwtService.destroyUser()
+          const { init } = useToast()
+          init({ message: 'Session expired, please login again', color: 'danger' })
+          router.push({ name: 'login' })
+        }
+        return Promise.reject(error)
+      },
+    )
+  }
+
+  async auth(path: string, data: any) {
+    return this.axios.post(path, data)
+  }
 
   async get(path: string) {
     return this.axios.get(path, {
       headers: {
         Authorization: JwtService.getAuthHeader(),
-        tenant: JwtService.getTenant(),
       },
     })
   }
@@ -23,7 +83,6 @@ class ApiService {
     return this.axios.post(path, data, {
       headers: {
         Authorization: JwtService.getAuthHeader(),
-        tenant: JwtService.getTenant(),
       },
     })
   }
@@ -32,7 +91,6 @@ class ApiService {
     return this.axios.put(path, data, {
       headers: {
         Authorization: JwtService.getAuthHeader(),
-        tenant: JwtService.getTenant(),
       },
     })
   }
@@ -41,7 +99,6 @@ class ApiService {
     return this.axios.delete(path, {
       headers: {
         Authorization: JwtService.getAuthHeader(),
-        tenant: JwtService.getTenant(),
       },
     })
   }
@@ -50,7 +107,6 @@ class ApiService {
     return this.axios.patch(path, data, {
       headers: {
         Authorization: JwtService.getAuthHeader(),
-        tenant: JwtService.getTenant(),
       },
     })
   }
@@ -59,7 +115,6 @@ class ApiService {
     return this.axios.head(path, {
       headers: {
         Authorization: JwtService.getAuthHeader(),
-        tenant: JwtService.getTenant(),
       },
     })
   }
@@ -68,7 +123,6 @@ class ApiService {
     return this.axios.options(path, {
       headers: {
         Authorization: JwtService.getAuthHeader(),
-        tenant: JwtService.getTenant(),
       },
     })
   }
