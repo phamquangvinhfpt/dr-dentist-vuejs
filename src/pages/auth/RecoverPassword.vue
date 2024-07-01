@@ -19,6 +19,7 @@ import { useForm, useToast } from 'vuestic-ui'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import { getErrorMessage } from '../../services/utils'
+import { useReCaptcha } from 'vue-recaptcha-v3'
 
 const email = ref('')
 const form = useForm('passwordForm')
@@ -27,17 +28,20 @@ const store = useAuthStore()
 const { init } = useToast()
 
 const isLoading = ref(false)
+const reCaptcha = useReCaptcha()
 
 const emailRules: ((v: string) => boolean | string)[] = [
   (v) => !!v || 'Email field is required',
   (v) => /.+@.+\..+/.test(v) || 'Email should be valid',
 ]
 
-const submit = () => {
+const submit = async () => {
+  isLoading.value = true
   if (form.validate()) {
-    isLoading.value = true
+    await reCaptcha?.recaptchaLoaded()
+    const captchaToken = await reCaptcha?.executeRecaptcha('forgot_password')
     store
-      .forgotPassword(email.value)
+      .forgotPassword(email.value, captchaToken ?? '')
       .then(() => {
         router.push({ name: 'recover-password-email' })
       })

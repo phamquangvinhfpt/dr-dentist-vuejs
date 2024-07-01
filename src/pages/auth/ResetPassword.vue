@@ -56,6 +56,7 @@ import { useAuthStore } from '@/stores/modules/auth.module'
 import { ref } from 'vue'
 import { ResetPassword } from './types'
 import { getErrorMessage } from '@/services/utils'
+import { useReCaptcha } from 'vue-recaptcha-v3'
 
 const route = useRoute()
 const { push } = useRouter()
@@ -75,16 +76,20 @@ const formData = reactive({
 
 const userEmail = route.query.Email as string
 const token = route.query.Token as string
+const reCaptcha = useReCaptcha()
 
 const submit = async () => {
+  isLoading.value = true
   if (validate()) {
+    await reCaptcha?.recaptchaLoaded()
+    const captcha = await reCaptcha?.executeRecaptcha('reset_password')
     const resetPasswordData: ResetPassword = {
       email: userEmail,
       token: token,
       newPassword: formData.password,
       confirmPassword: formData.repeatPassword,
+      captchaToken: captcha ?? '',
     }
-    isLoading.value = true
     store
       .resetPassword(resetPasswordData)
       .then(() => {

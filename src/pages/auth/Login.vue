@@ -53,10 +53,12 @@ import { useForm, useToast } from 'vuestic-ui'
 import { validators } from '../../services/utils'
 import { useAuthStore } from '@modules/auth.module'
 import { getErrorMessage } from '../../services/utils'
+import { useReCaptcha } from 'vue-recaptcha-v3'
 
 const { validate } = useForm('form')
 const { push } = useRouter()
 const { init } = useToast()
+const reCaptcha = useReCaptcha()
 
 const isLoading = ref(false)
 
@@ -71,8 +73,10 @@ const store = useAuthStore()
 const submit = async () => {
   isLoading.value = true
   if (validate()) {
+    await reCaptcha?.recaptchaLoaded()
+    const captchaToken = await reCaptcha?.executeRecaptcha('login')
     store
-      .login(formData.email, formData.password)
+      .login(formData.email, formData.password, captchaToken ?? '')
       .then(() => {
         store.isAuthenticated = true
         init({ message: 'You are now logged in...', color: 'success' })

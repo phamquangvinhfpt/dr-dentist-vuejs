@@ -4,12 +4,14 @@ import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useToast } from 'vuestic-ui'
 import { getErrorMessage } from '@/services/utils'
+import { useReCaptcha } from 'vue-recaptcha-v3'
 
 const { validate } = useForm('form')
 const { push } = useRouter()
 const { init } = useToast()
 
 const isLoading = ref(false)
+const reCaptcha = useReCaptcha()
 
 const formData = reactive({
   fullName: '',
@@ -19,11 +21,20 @@ const formData = reactive({
   phoneNumber: '',
 })
 const store = useAuthStore()
-const submit = () => {
+const submit = async () => {
   isLoading.value = true
   if (validate()) {
+    await reCaptcha?.recaptchaLoaded()
+    const captchaToken = await reCaptcha?.executeRecaptcha('register')
     store
-      .register(formData.fullName, formData.email, formData.password, formData.confirmPassword, formData.phoneNumber)
+      .register(
+        formData.fullName,
+        formData.email,
+        formData.password,
+        formData.confirmPassword,
+        formData.phoneNumber,
+        captchaToken ?? '',
+      )
       .then((response) => {
         init({
           message: response.data.message,

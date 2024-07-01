@@ -3,4 +3,5 @@ export type ResetPassword = {
   token: string
   newPassword: string
   confirmPassword: string
+  captchaToken: string
 }

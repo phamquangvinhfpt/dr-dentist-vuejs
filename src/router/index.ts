@@ -44,6 +44,14 @@ const routes: Array<RouteRecordRaw> = [
           },
         ],
       },
+      {
+        name: 'profile',
+        path: 'profile',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/user/UserProfile.vue'),
+      },
     ],
   },
   {
@@ -55,6 +63,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'login',
         meta: {
           requiresAuth: false,
+          requiresCaptcha: true,
         },
         component: () => import('../pages/auth/Login.vue'),
       },
@@ -63,6 +72,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'signup',
         meta: {
           requiresAuth: false,
+          requiresCaptcha: true,
         },
         component: () => import('../pages/auth/Signup.vue'),
       },
@@ -71,6 +81,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'recover-password',
         meta: {
           requiresAuth: false,
+          requiresCaptcha: true,
         },
         component: () => import('../pages/auth/RecoverPassword.vue'),
       },

@@ -44,6 +44,8 @@ export const getErrorMessage = (error: any): string => {
     if (data.title) {
       return data.title
     }
+
+    return error.response.data
   }
 
   return error.message || 'An unknown error occurred';

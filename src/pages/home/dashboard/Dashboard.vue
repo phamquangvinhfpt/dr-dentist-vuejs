@@ -11,13 +11,10 @@ const isStudent = computed(() => authStore?.musHaveRole('Basic')) // just for te
   <h1 class="page-title font-bold">Dashboard</h1>
 
   <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-    <div v-if="isTeacher" class="bg-white shadow-lg rounded-lg p-6">
-      <h2 class="text-lg font-bold">Teacher can see this</h2>
-      <p class="text-3xl font-bold">hola</p>
-    </div>
-    <div v-if="isStudent" class="bg-white shadow-lg rounded-lg p-6">
-      <h2 class="text-lg font-bold">Student can see this</h2>
-      <p class="text-3xl font-bold">laho</p>
-    </div>
+    <VaScrollContainer class="max-h-52" vertical>
+      >
+      <VaCard v-if="isTeacher" title="Teacher" description="Teacher description" />
+      <VaCard v-if="isStudent" title="Student" description="Student description" />
+    </VaScrollContainer>
   </div>
 </template>

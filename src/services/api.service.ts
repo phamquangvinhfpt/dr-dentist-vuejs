@@ -17,7 +17,7 @@ class ApiService {
   constructor() {
     this.axios.interceptors.request.use(
       async function (config) {
-        if (config.url !== '/Auth/RefreshToken' && config.url !== '/Auth/Authenticate') {
+        if (config.url !== '/refresh-token' && config.url !== '/tokens') {
           // config.headers.Authorization = JwtService.getAuthHeader()
           console.log('c')
           const tokenExpiryTime = JwtService.getTokenExpiryTime()
@@ -55,7 +55,10 @@ class ApiService {
         return response
       },
       function (error) {
-        if (error.response.status === 401) {
+        if (
+          error.response.status === 401 &&
+          error.response.data.exception != 'Authentication Failed, Invalid Email or Password.'
+        ) {
           JwtService.destroyToken()
           JwtService.destroyUser()
           const { init } = useToast()
@@ -69,6 +72,10 @@ class ApiService {
 
   async auth(path: string, data: any) {
     return this.axios.post(path, data)
+  }
+
+  getAxiosInstance() {
+    return this.axios
   }
 
   async get(path: string) {

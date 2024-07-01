@@ -1,14 +1,27 @@
 <template>
-  <VaButtonToggle v-model="theme" color="background-element" border-color="background-element" :options="options" />
+  <VaSwitch
+    v-model="mode"
+    class="mr-5"
+    color="#5123a1"
+    off-color="#ffd300"
+    size="small"
+    style="--va-switch-checker-background-color: #252723"
+  >
+    <template #innerLabel>
+      <div class="va-text-center">
+        <VaIcon :name="mode ? 'dark_mode' : 'light_mode'" />
+      </div>
+    </template>
+  </VaSwitch>
 </template>
 <script lang="ts" setup>
-import { computed } from 'vue'
-
-import { useI18n } from 'vue-i18n'
+import { computed, onMounted, ref, watch } from 'vue'
 
 import { useColors } from 'vuestic-ui'
 
 const { applyPreset, currentPresetName } = useColors()
+
+const mode = ref(false)
 
 const theme = computed({
   get() {
@@ -16,13 +29,26 @@ const theme = computed({
   },
   set(value) {
     applyPreset(value)
+    localStorage.setItem('theme', value)
   },
 })
 
-const { t } = useI18n()
+watch(
+  () => mode.value,
+  (value) => {
+    theme.value = value ? 'dark' : 'light'
+  },
+)
 
-const options = [
-  { label: t('buttonSelect.dark'), value: 'dark' },
-  { label: t('buttonSelect.light'), value: 'light' },
-]
+onMounted(() => {
+  const theme = localStorage.getItem('theme')
+  if (theme) {
+    if (theme === 'dark') {
+      mode.value = true
+    } else {
+      mode.value = false
+    }
+    applyPreset(theme)
+  }
+})
 </script>

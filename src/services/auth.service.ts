@@ -4,8 +4,8 @@ import jwtService from '@services/jwt.service'
 
 class AuthService {
   async refreshToken(): Promise<any> {
-    return apiService
-      .post('/Auth/RefreshToken', {
+    return apiService.axios
+      .post('/refresh-token', {
         accessToken: jwtService.getToken(),
         refreshToken: jwtService.getRefreshToken(),
       })
@@ -19,11 +19,12 @@ class AuthService {
       })
   }
 
-  async login(email: string, password: string): Promise<any> {
+  async login(email: string, password: string, captchaToken: string): Promise<any> {
     return apiService
-      .auth('/Auth/Authenticate', {
+      .auth('/tokens', {
         email,
         password,
+        captchaToken,
       })
       .then((response) => {
         if (response.data.message) {
@@ -43,14 +44,16 @@ class AuthService {
     password: string,
     confirmPassword: string,
     phoneNumber: string,
+    captchaToken: string,
   ): Promise<any> {
     return apiService
-      .auth('/Auth/Register', {
+      .auth('/register', {
         fullName,
         email,
         password,
         confirmPassword,
         phoneNumber,
+        captchaToken,
       })
       .then((response) => {
         return Promise.resolve(response)
@@ -62,7 +65,7 @@ class AuthService {
 
   async logout() {
     apiService
-      .post('/Auth/Logout', {})
+      .post('/logout', {})
       .then((response) => {
         console.log(response)
         return Promise.resolve()
@@ -73,8 +76,8 @@ class AuthService {
   }
 
   async confirmEmail(userId: string, code: string): Promise<any> {
-    return apiService
-      .get(`/Auth/ConfirmEmail?userId=${userId}&code=${code}`)
+    return apiService.axios
+      .get(`/confirm-email?userId=${userId}&token=${code}`)
       .then((response) => {
         return Promise.resolve(response)
       })
@@ -83,17 +86,26 @@ class AuthService {
       })
   }
 
-  async forgotPassword(email: string): Promise<any> {
+  async forgotPassword(email: string, captchaToken: string): Promise<any> {
     const queryParams = new URLSearchParams({ email }).toString()
-    const url = `/Auth/ForgetPassword?${queryParams}`
-    return apiService.axios.post(url).then((response) => {
-      return Promise.resolve(response)
-    })
+    const url = `/forget-password?${queryParams}`
+    return apiService.axios
+      .post(url, captchaToken, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((response) => {
+        return Promise.resolve(response)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
   }
 
   async resetPassword(data: ResetPassword) {
     const queryParams = new URLSearchParams(data).toString()
-    const url = `/Auth/ResetPassword?${queryParams}`
+    const url = `/reset-password?${queryParams}`
     return apiService.axios.post(url).then((response) => {
       return Promise.resolve(response)
     })
