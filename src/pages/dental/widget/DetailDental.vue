@@ -14,7 +14,7 @@ const dentalRecords = ref<DentalRecord>()
 const appointment = ref<Appointment>()
 const prescription = ref<Prescription[]>()
 const medical = ref<MedicalRecord>()
-const followUp = ref<FollowUpAppointment[]>()
+const followUp = ref<FollowUpAppointment[]>([])
 const getDentalByID = async (id: string) => {
   try {
     const res = await dentalStore.GetDentalRecordByID(id)
@@ -63,6 +63,10 @@ const formatDate = (dateString: string) => {
     month: '2-digit',
     year: 'numeric',
   })
+}
+
+const booleanToString = (value: boolean) => {
+  return value ? 'True' : 'False'
 }
 const formattedDate = computed(() => {
   return appointment.value?.date ? formatDate(appointment.value.date) : ''
@@ -136,7 +140,7 @@ const appointmentType = computed(() => {
           <VaInput v-model="item.reason" :label="'Reason'" class="mb-6" readonly />
         </VaField>
         <VaField>
-          <VaInput v-model="item.isSuccess" :label="'Done'" class="mb-6" readonly />
+          <VaInput :model-value="booleanToString(item.isSuccess)" :label="'Done'" class="mb-6" readonly />
         </VaField>
       </div>
     </VaCard>

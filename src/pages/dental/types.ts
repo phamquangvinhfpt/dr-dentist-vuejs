@@ -1,4 +1,3 @@
-import { Appointment } from './types'
 export interface DentalRecord extends BaseEntity {
   appointmentID: string
   appointment: Appointment
