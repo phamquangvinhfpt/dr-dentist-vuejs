@@ -34,6 +34,7 @@ export default {
       displayName: 'record',
       meta: {
         icon: 'vuestic-iconset-exam',
+        permission: 'DentalRecords.View',
       },
       children: [
         {

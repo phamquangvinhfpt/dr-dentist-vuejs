@@ -1,4 +1,3 @@
-import { GetAppointmentForCreateDental } from './../../pages/dental/types'
 import { defineStore } from 'pinia'
 import dentalService from '@services/dental.service'
 import {
