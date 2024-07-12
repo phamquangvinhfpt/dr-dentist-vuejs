@@ -22,25 +22,23 @@ export default {
       },
     },
     {
-      name: 'questions',
-      displayName: 'menu.questions',
+      name: 'users-management',
+      displayName: 'menu.usersManagement',
       meta: {
-        icon: 'snippet_folder',
+        icon: 'vuestic-iconset-user',
+        permission: 'Users.View',
+      },
+    },
+    {
+      name: 'record',
+      displayName: 'record',
+      meta: {
+        icon: 'vuestic-iconset-exam',
       },
       children: [
         {
-          name: 'question-folder',
-          displayName: 'menu.question-folder',
-          meta: {
-            permission: 'QuestionFolders.View',
-          },
-        },
-        {
-          name: 'question-bank',
-          displayName: 'menu.question-bank',
-          meta: {
-            permission: 'QuestionFolders.View',
-          },
+          name: 'record-list',
+          displayName: 'menu.record-list',
         },
       ],
     },

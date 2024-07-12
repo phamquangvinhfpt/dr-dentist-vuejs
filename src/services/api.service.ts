@@ -5,7 +5,7 @@ import { useToast } from 'vuestic-ui'
 import router from '@/router'
 
 class ApiService {
-  private api_url =  import.meta.env.VITE_APP_BASE_URL as string
+  private api_url = import.meta.env.VITE_APP_BASE_URL as string
 
   public axios = axios.create({
     baseURL: this.api_url,

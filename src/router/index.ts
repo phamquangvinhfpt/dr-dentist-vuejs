@@ -25,32 +25,53 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/home/dashboard/Dashboard.vue'),
       },
       {
-        name: 'questions',
-        path: 'questions',
-        meta: {
-          requiresAuth: true,
-        },
-        component: RouteViewComponent,
-        children: [
-          {
-            name: 'question-folder',
-            path: 'question-folder',
-            component: () => import('../pages/question/QuestionFolder.vue'),
-          },
-          {
-            name: 'question-bank',
-            path: 'question-bank',
-            component: () => import('../pages/question/QuestionBank.vue'),
-          },
-        ],
-      },
-      {
         name: 'profile',
         path: 'profile',
         meta: {
           requiresAuth: true,
         },
         component: () => import('../pages/user/UserProfile.vue'),
+      },
+      {
+        name: 'record',
+        path: 'record',
+        meta: {
+          requiresAuth: true,
+        },
+        component: RouteViewComponent,
+        children: [
+          {
+            name: 'record-list',
+            path: 'record-list',
+            component: () => import('../pages/dental/GetAllDental.vue'),
+          },
+          {
+            name: 'detail',
+            path: 'detail',
+            component: () => import('../pages/dental/widget/DetailOption.vue'),
+          },
+          {
+            name: 'create',
+            path: 'create',
+            component: () => import('../pages/dental/widget/CreateDentalOption.vue'),
+          },
+        ],
+      },
+      {
+        name: 'notifications',
+        path: 'notification',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/notification/Notification.vue'),
+      },
+      {
+        name: 'users-management',
+        path: 'users-management',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/user/UsersManagement.vue'),
       },
     ],
   },

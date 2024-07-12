@@ -1,18 +1,3 @@
-// export type UserDetail = {
-//   id: string
-//   userName: string
-//   firstName: string
-//   lastName: string
-//   email: string
-//   isActive: boolean
-//   emailConfirmed: boolean
-//   phoneNumberConfirmed: boolean
-//   phoneNumber: string
-//   imageUrl: string | null
-//   birthDate: string | null
-//   gender: boolean
-// }
-
 export interface UserDetail {
   id: string
   userName: string
@@ -35,7 +20,7 @@ export enum Gender {
 export enum UserStatus {
   Active,
   Pending,
-  Inactive
+  Inactive,
 }
 
 export type SettingProfile = {
@@ -87,4 +72,24 @@ export type Avatar = {
 
 export type RemoveAvatar = {
   deleteCurrentImage: boolean
+}
+
+export type FilterUser = {
+  pageNumber: number
+  pageSize: number
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+  searchTerm?: string
+  filterBy?: string
+  filterValue?: string
+}
+
+export type PagingUser = {
+  pageNumber: 1
+  pageSize: number
+  totalPages: number
+  totalRecords: number
+  currentPage: string
+  previousPage?: string
+  nextPage?: string
 }

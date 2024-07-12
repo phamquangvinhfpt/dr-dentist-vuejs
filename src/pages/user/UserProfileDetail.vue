@@ -13,6 +13,9 @@ import { useAuthStore } from '@/stores/modules/auth.module'
 import { AvatarFiles, OTP } from './UserProfile.enum'
 import { useUserProfileStore } from '@/stores/modules/user.module'
 import { getErrorMessage } from '@/services/utils'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   settingOption: {
@@ -81,9 +84,9 @@ watch(
   () => props.settingOption?.id,
   (id) => {
     const showProfile = id == '1'
-    // if (showProfile) {
-    //   getUserDetail()
-    // }
+    if (showProfile) {
+      getUserDetail()
+    }
     isShowProfile.value = showProfile
   },
   { immediate: true },
@@ -99,40 +102,40 @@ const formDataChangePassword = reactive({ ...passwordDetail.value })
 const formDataChangePhoneNumber = reactive({ phoneNumber: '', password: '' })
 const formDataChangePhoneOTP = reactive({ otpCode: '' })
 const formDataChangeEmail = reactive({ email: '', password: '' })
-
+console.log('userForm', formData.fullName)
 const phoneNumberRules: ((v: string) => boolean | string)[] = [
-  (v) => !!v || 'Phone Number field is required',
-  (v) => (v && v.length >= 10) || 'Phone Number must be at least 10 characters long',
-  (v) => (v && v.length <= 15) || 'Phone Number must be at most 15 characters long',
-  (v) => (v && /^\d+$/.test(v)) || 'Phone Number must contain only numbers',
+  (v) => !!v || t('auth.phone_number_required'),
+  (v) => (v && v.length >= 10) || t('auth.phone_number_min_length'),
+  (v) => (v && v.length <= 15) || t('auth.phone_number_max_length'),
+  (v) => (v && /^\d+$/.test(v)) || t('auth.phone_number_only_numbers'),
 ]
 
 const phoneOtpRules: ((v: string) => boolean | string)[] = [
-  (v) => !!v || 'OTP code field is required',
-  (v) => (v && v.length == 6) || 'OTP code must be 6 characters long',
-  (v) => (v && /^\d+$/.test(v)) || 'OTP code must contain only numbers',
+  (v) => !!v || t('auth.otp_code_required'),
+  (v) => (v && v.length == 6) || t('auth.otp_code_length'),
+  (v) => (v && /^\d+$/.test(v)) || t('auth.otp_code_only_numbers'),
 ]
 
 const emailRules: ((v: string) => boolean | string)[] = [
-  (v) => !!v || 'Email field is required',
-  (v) => /.+@.+\..+/.test(v) || 'Email should be valid',
+  (v) => !!v || t('auth.email_required'),
+  (v) => /.+@.+\..+/.test(v) || t('auth.email_valid'),
 ]
 
 const passwordRules: ((v: string) => boolean | string)[] = [
-  (v) => !!v || 'Password field is required',
-  (v) => (v && v.length >= 8) || 'Password must be at least 8 characters long',
-  (v) => (v && /[A-Za-z]/.test(v)) || 'Password must contain at least one letter',
-  (v) => (v && /\d/.test(v)) || 'Password must contain at least one number',
-  (v) => (v && /[!@#$%^&*(),.?":{}|<>]/.test(v)) || 'Password must contain at least one special character',
+  (v) => !!v || t('auth.password_required'),
+  (v) => (v && v.length >= 8) || t('auth.password_min_length'),
+  (v) => (v && /[A-Za-z]/.test(v)) || t('auth.password_letter_required'),
+  (v) => (v && /\d/.test(v)) || t('auth.password_number_required'),
+  (v) => (v && /[!@#$%^&*(),.?":{}|<>]/.test(v)) || t('auth.password_special_character_required'),
 ]
 
 const genderOptions = reactive([
   {
-    text: 'male',
+    text: t('auth.male'),
     value: 1,
   },
   {
-    text: 'female',
+    text: t('auth.female'),
     value: 0,
   },
 ])
@@ -228,13 +231,12 @@ const submit = async () => {
       gender: formData.gender,
       birthDate: date,
     }
-    console.log(userDetailData)
     await userProfileStore
       .updateProfile(userDetailData)
       .then(() => {
         notify({
-          title: 'Success',
-          message: 'Updated profile successfully!',
+          title: t('auth.success'),
+          message: t('auth.updated_profile_successfully'),
           color: 'success',
         })
         getUserDetail()
@@ -242,7 +244,7 @@ const submit = async () => {
       .catch((error) => {
         const message = getErrorMessage(error)
         notify({
-          title: 'Error',
+          title: t('auth.error'),
           message: message,
           color: 'danger',
         })
@@ -262,15 +264,15 @@ const submitChangePassword = async () => {
       .changePassword(passwordDetailData)
       .then(() => {
         notify({
-          title: 'Success',
-          message: 'Change password successfully!',
+          title: t('auth.success'),
+          message: t('auth.change_password_successfully'),
           color: 'success',
         })
       })
       .catch((error) => {
         const message = getErrorMessage(error)
         notify({
-          title: 'Error',
+          title: t('auth.error'),
           message: message,
           color: 'danger',
         })
@@ -291,8 +293,8 @@ const submitChangeEmail = async () => {
     .changeEmail(changeEmailData)
     .then(() => {
       notify({
-        title: 'Success',
-        message: 'Change email successfully. Please check your email and confirm the email!',
+        title: t('auth.success'),
+        message: t('auth.change_email_successfully'),
         color: 'success',
       })
       getUserDetail()
@@ -300,7 +302,7 @@ const submitChangeEmail = async () => {
     .catch((error) => {
       const message = getErrorMessage(error)
       notify({
-        title: 'Error',
+        title: t('auth.error'),
         message: message,
         color: 'danger',
       })
@@ -339,8 +341,8 @@ const submitChangePhone = async () => {
     .changePhone(changePhoneData)
     .then(() => {
       notify({
-        title: 'Success',
-        message: 'The OTP code was sent to your phone, fill it in the field to confirm.',
+        title: t('auth.success'),
+        message: t('auth.otp_code_sent'),
         color: 'success',
       })
       isShowChangePhoneOTP.value = true
@@ -354,7 +356,7 @@ const submitChangePhone = async () => {
     .catch((error) => {
       const message = getErrorMessage(error)
       notify({
-        title: 'Error',
+        title: t('auth.error'),
         message: message,
         color: 'danger',
       })
@@ -371,7 +373,7 @@ const handleFileAdded = (files: any) => {
     fileUploaded.value = files[0]
     if (!validateAvatar(files[0])) {
       notify({
-        message: 'Your file is bigger than 5MB. Please upload a file less than 5MB.',
+        message: t('auth.file_too_big'),
         color: '#e2eafa',
       })
     } else {
@@ -387,8 +389,8 @@ const uploadAvatar = async (formDataAvatar: FormData) => {
     .uploadAvatar(formDataAvatar)
     .then(() => {
       notify({
-        title: 'Success',
-        message: 'Change avatar successfully!',
+        title: t('auth.success'),
+        message: t('auth.change_avatar_successfully'),
         color: 'success',
       })
       getUserDetail()
@@ -396,7 +398,7 @@ const uploadAvatar = async (formDataAvatar: FormData) => {
     .catch((error) => {
       const message = getErrorMessage(error)
       notify({
-        title: 'Error',
+        title: t('auth.error'),
         message: message,
         color: 'danger',
       })
@@ -417,8 +419,8 @@ const handleRemoveAvatar = async () => {
     .removeAvatar(formDataRemoveAvatar)
     .then(() => {
       notify({
-        title: 'success',
-        message: 'Remove avatar successfully!',
+        title: t('auth.success'),
+        message: t('auth.remove_avatar_successfully'),
         color: 'success',
       })
       getUserDetail()
@@ -427,7 +429,7 @@ const handleRemoveAvatar = async () => {
     .catch((error) => {
       const message = getErrorMessage(error)
       notify({
-        title: 'Error',
+        title: t('auth.error'),
         message: message,
         color: 'danger',
       })
@@ -449,8 +451,8 @@ const submitChangePhoneOTP = async () => {
     .getOTPConfirmation(formDataChangePhoneOTP?.otpCode)
     .then(() => {
       notify({
-        title: 'Success',
-        message: 'Phone confirmed successfully',
+        title: t('auth.success'),
+        message: t('auth.phone_confirmed_successfully'),
         color: 'success',
       })
       getUserDetail()
@@ -458,7 +460,7 @@ const submitChangePhoneOTP = async () => {
     .catch((error) => {
       const message = getErrorMessage(error)
       notify({
-        title: 'Error',
+        title: t('auth.error'),
         message: message,
         color: 'danger',
       })
@@ -475,8 +477,8 @@ const verifyPhoneNumber = async () => {
     .sendPhoneOTPCode()
     .then(() => {
       notify({
-        title: 'Success',
-        message: 'OTP code was sent to your phone, fill it to verify.',
+        title: t('auth.success'),
+        message: t('auth.otp_code_sent_verify'),
         color: 'success',
       })
       isShowModal.value.phoneNumber = true
@@ -490,7 +492,7 @@ const verifyPhoneNumber = async () => {
     .catch((error) => {
       const message = getErrorMessage(error)
       notify({
-        title: 'Error',
+        title: t('auth.error'),
         message: message,
         color: 'danger',
       })
@@ -502,15 +504,15 @@ const verifyEmail = async () => {
     .sendVerifyEmail()
     .then(() => {
       notify({
-        title: 'Success',
-        message: 'Check your email to verify.',
+        title: t('auth.success'),
+        message: t('auth.check_email_verify'),
         color: 'success',
       })
     })
     .catch((error) => {
       const message = getErrorMessage(error)
       notify({
-        title: 'Error',
+        title: t('auth.error'),
         message: message,
         color: 'danger',
       })
@@ -529,13 +531,13 @@ const verifyEmail = async () => {
             </template>
             <VaModal
               v-model="isShowModal.removeAvatar"
-              :ok-text="'Remove'"
+              :ok-text="t('auth.remove')"
               size="small"
               :child-ok-button="{ size: 'small' }"
               :child-cancel-button="{ size: 'small' }"
               @ok="handleRemoveAvatar"
             >
-              <p class="text-lg">Are you sure want to remove avatar?</p>
+              <p class="text-lg">{{ t('auth.confirm_remove_avatar') }}</p>
             </VaModal>
             <VaAvatar :src="getSrcAvatar()" size="large" />
           </VaBadge>
@@ -552,7 +554,7 @@ const verifyEmail = async () => {
           />
           <VaButton class="flex items-center" preset="secondary" border-color="primary" size="small">
             <VaIcon name="upload" class="mr-2" />
-            Upload
+            {{ t('auth.upload') }}
           </VaButton>
         </div>
       </div>
@@ -561,42 +563,44 @@ const verifyEmail = async () => {
           <VaField>
             <VaInput
               v-model="formData.fullName"
-              :label="'FullName'"
-              class="mb-6"
-              :rules="[(v: any) => !!v || 'Full Name field is required']"
-              :placeholder="'Enter your full name'"
+              :label="t('auth.full_name')"
+              class="mb-3"
+              :rules="[(v: any) => !!v || t('auth.full_name_required')]"
+              :placeholder="t('auth.enter_full_name')"
             />
           </VaField>
 
           <VaField>
             <VaDateInput
               v-model="formData.dob"
-              :rules="[(v: any) => !!v || 'Date of birth field is required']"
+              :rules="[(v: any) => !!v || t('auth.birth_date_required')]"
               class="mb-3"
-              :label="'Birth Date'"
-              :placeholder="'Enter your birth date'"
+              :label="t('auth.birth_date')"
+              :placeholder="t('auth.enter_birth_date')"
             />
           </VaField>
           <VaField>
-            <label class="block uppercase text-primary font-bold" style="font-size: 0.57rem">Gender</label>
+            <label class="block uppercase text-primary font-bold" style="font-size: 0.57rem">{{
+              t('auth.gender')
+            }}</label>
             <VaRadio
               v-model="formData.gender"
-              :rules="[(v: null | undefined) => (v !== null && v !== undefined) || 'Gender field is required']"
+              :rules="[(v: null | undefined) => (v !== null && v !== undefined) || t('auth.gender_required')]"
               class="mb-3"
               value-by="value"
               name="gender"
-              :label="'Choose your gender'"
+              :label="t('auth.choose_gender')"
               :options="genderOptions"
             />
           </VaField>
           <VaField>
             <VaInput
               v-model="formData.phoneNumber"
-              :placeholder="'Enter phone number'"
+              :placeholder="t('auth.enter_phone_number')"
               class="mb-3"
               readonly
               preset="solid"
-              :label="'Phone Number'"
+              :label="t('auth.phone_number')"
             >
               <template #messages>
                 <div class="flex justify-between">
@@ -605,13 +609,13 @@ const verifyEmail = async () => {
                     class="font-semibold text-xs text-orange-500 cursor-pointer mt-1"
                     @click="verifyPhoneNumber"
                   >
-                    Verify phone number
+                    {{ t('auth.verify_phone_number') }}
                   </p>
                   <p
                     class="font-semibold text-xs text-primary cursor-pointer mt-1"
                     @click="isShowModal.phoneNumber = !isShowModal.phoneNumber"
                   >
-                  Change phone number
+                    {{ t('auth.change_phone_number') }}
                   </p>
                 </div>
               </template>
@@ -621,11 +625,11 @@ const verifyEmail = async () => {
           <VaField>
             <VaInput
               v-model="formData.email"
-              :placeholder="'Enter your email'"
+              :placeholder="t('auth.enter_email')"
               readonly
               preset="solid"
               class="mb-3"
-              :label="'Email'"
+              :label="t('auth.email')"
               type="email"
             >
               <template #messages>
@@ -635,13 +639,13 @@ const verifyEmail = async () => {
                     class="font-semibold text-xs text-orange-500 cursor-pointer mt-1"
                     @click="verifyEmail"
                   >
-                    Verify email
+                    {{ t('auth.verify_email') }}
                   </p>
                   <p
                     class="font-semibold text-xs text-primary cursor-pointer mt-1"
                     @click="isShowModal.email = !isShowModal.email"
                   >
-                  Change email
+                    {{ t('auth.change_email') }}
                   </p>
                 </div>
               </template>
@@ -650,7 +654,7 @@ const verifyEmail = async () => {
         </div>
         <div class="flex justify-end">
           <VaButton class="w-fit rounded mb-3" :disabled="isDisabledButtonUpdateProfile" @click="submit">
-            Update
+            {{ t('auth.update') }}
           </VaButton>
         </div>
       </VaForm>
@@ -665,7 +669,7 @@ const verifyEmail = async () => {
                 :rules="passwordRules"
                 :type="isPasswordVisible.value ? 'text' : 'password'"
                 class="mb-4"
-                :label="'Current Password'"
+                :label="t('auth.current_password')"
                 @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
               >
                 <template #appendInner>
@@ -687,7 +691,7 @@ const verifyEmail = async () => {
                 :rules="passwordRules"
                 :type="isPasswordVisible.value ? 'text' : 'password'"
                 class="mb-4"
-                :label="'New Password'"
+                :label="t('auth.new_password')"
                 @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
               >
                 <template #appendInner>
@@ -706,12 +710,12 @@ const verifyEmail = async () => {
                 ref="password2"
                 v-model="formDataChangePassword.confirmNewPassword"
                 :rules="[
-                  (v: any) => !!v || 'Confirm Password field is required',
-                  (v: string) => v === formDataChangePassword.newPassword || 'Passwords do not match',
+                  (v: any) => !!v || t('auth.confirm_password_required'),
+                  (v: string) => v === formDataChangePassword.newPassword || t('auth.passwords_dont_match'),
                 ]"
                 :type="isPasswordVisible.value ? 'text' : 'password'"
                 class="mb-4"
-                :label="'Confirm New Password'"
+                :label="t('auth.confirm_new_password')"
                 @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
               >
                 <template #appendInner>
@@ -727,22 +731,22 @@ const verifyEmail = async () => {
         </div>
         <div class="flex justify-end">
           <VaButton class="w-fit rounded mb-3" :disabled="isDisabledButtonChangePassword" @click="submitChangePassword">
-            Update
+            {{ t('auth.update') }}
           </VaButton>
         </div>
       </VaForm>
     </VaCard>
 
     <VaModal v-model="isShowModal.email" hide-default-actions size="small">
-      <h3 class="va-h3 text-center">Email</h3>
+      <h3 class="va-h3 text-center">{{ t('auth.email') }}</h3>
       <VaForm ref="formChangeEmail" @submit.prevent="submitChangeEmail">
         <VaField>
           <VaInput
             v-model="formDataChangeEmail.email"
-            :placeholder="'Enter new email'"
+            :placeholder="t('auth.enter_new_email')"
             :rules="emailRules"
             class="mb-3"
-            :label="'Email'"
+            :label="t('auth.email')"
             type="email"
           />
         </VaField>
@@ -753,8 +757,8 @@ const verifyEmail = async () => {
               :rules="passwordRules"
               :type="isPasswordVisible.value ? 'text' : 'password'"
               class="mb-4"
-              :placeholder="'Enter password'"
-              :label="'Password'"
+              :placeholder="t('auth.enter_password')"
+              :label="t('auth.password')"
               @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
             >
               <template #appendInner>
@@ -768,23 +772,25 @@ const verifyEmail = async () => {
           </VaValue>
         </VaField>
         <VaButton class="w-full rounded mb-3" :disabled="isDisabledButtonChangeEmail" @click="submitChangeEmail">
-          Confirm
+          {{ t('auth.confirm') }}
         </VaButton>
-        <p class="text-primary text-sm text-start cursor-pointer" @click="isShowModal.email = false">&#60; Back</p>
+        <p class="text-primary text-sm text-start cursor-pointer" @click="isShowModal.email = false">
+          &#60; {{ t('auth.back') }}
+        </p>
       </VaForm>
     </VaModal>
     <VaModal v-model="isShowModal.phoneNumber" hide-default-actions size="small">
       <h3 class="va-h3 text-center">
-        {{ isShowChangePhoneOTP ? 'OTP Confirmation' : 'Change phone number' }}
+        {{ isShowChangePhoneOTP ? t('auth.otp_confirmation') : t('auth.change_phone_number') }}
       </h3>
       <VaForm v-if="!isShowChangePhoneOTP" ref="formChangePhone" @submit.prevent="submitChangePhone">
         <VaField>
           <VaInput
             v-model="formDataChangePhoneNumber.phoneNumber"
-            :placeholder="'Enter new phone number'"
+            :placeholder="t('auth.enter_new_phone_number')"
             :rules="phoneNumberRules"
             class="mb-3"
-            :label="'New phone number'"
+            :label="t('auth.new_phone_number')"
           />
         </VaField>
         <VaField>
@@ -794,8 +800,8 @@ const verifyEmail = async () => {
               :rules="passwordRules"
               :type="isPasswordVisible.value ? 'text' : 'password'"
               class="mb-4"
-              :placeholder="'Enter password'"
-              :label="'Password'"
+              :placeholder="t('auth.enter_password')"
+              :label="t('auth.password')"
               @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
             >
               <template #appendInner>
@@ -809,29 +815,35 @@ const verifyEmail = async () => {
           </VaValue>
         </VaField>
         <VaButton class="w-full rounded mb-3" :disabled="isDisabledButtonChangePhoneNumber" @click="submitChangePhone">
-          Confirm
+          {{ t('auth.confirm') }}
         </VaButton>
-        <p class="text-primary text-sm text-start cursor-pointer" @click="handleCancelChangePhone">&#60; Back</p>
+        <p class="text-primary text-sm text-start cursor-pointer" @click="handleCancelChangePhone">
+          &#60; {{ t('auth.back') }}
+        </p>
       </VaForm>
       <VaForm v-if="isShowChangePhoneOTP" ref="formChangePhoneOTP" @submit.prevent="submitChangePhoneOTP">
         <VaField>
           <VaInput
             v-model="formDataChangePhoneOTP.otpCode"
-            :placeholder="'Enter OTP code'"
+            :placeholder="t('auth.enter_otp_code')"
             :rules="phoneOtpRules"
             class="mb-3"
-            :label="'OTP Code'"
+            :label="t('auth.otp_code')"
           />
         </VaField>
 
         <p class="text-primary text-sm text-start">
-          <span v-if="OTPTime !== 0" class="mr-2">Remaining {{ OTPTime }}s</span>
-          <span v-if="OTPTime === 0" class="cursor-pointer" @click="verifyPhoneNumber">&#11118; Resend</span>
+          <span v-if="OTPTime !== 0" class="mr-2">{{ t('auth.remaining') }} {{ OTPTime }}s</span>
+          <span v-if="OTPTime === 0" class="cursor-pointer" @click="verifyPhoneNumber"
+            >&#11118; {{ t('auth.resend') }}</span
+          >
         </p>
         <VaButton class="w-full rounded mb-3" :disabled="isDisabledButtonChangePhoneOTP" @click="submitChangePhoneOTP">
-          Confirm
+          {{ t('auth.confirm') }}
         </VaButton>
-        <p class="text-primary text-sm text-start cursor-pointer" @click="handleCancelChangePhone">&#60; Back</p>
+        <p class="text-primary text-sm text-start cursor-pointer" @click="handleCancelChangePhone">
+          &#60; {{ t('auth.back') }}
+        </p>
       </VaForm>
     </VaModal>
   </VaInnerLoading>

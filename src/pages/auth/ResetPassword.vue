@@ -1,7 +1,7 @@
 <template>
   <VaInnerLoading :loading="isLoading" :size="60">
     <VaForm ref="form" @submit.prevent="submit">
-      <h1 class="font-semibold text-4xl mb-4">Reset password</h1>
+      <h1 class="font-semibold text-4xl mb-4">{{ t('auth.reset_password') }}</h1>
       <VaValue v-slot="isPasswordVisible" :default-value="false">
         <VaInput
           ref="password1"
@@ -9,8 +9,8 @@
           :rules="passwordRules"
           :type="isPasswordVisible.value ? 'text' : 'password'"
           class="mb-4"
-          label="Password"
-          messages="Password should be 8+ characters: letters, numbers, and special characters."
+          :label="t('auth.password')"
+          :messages="t('auth.password_hint')"
           @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
         >
           <template #appendInner>
@@ -25,12 +25,12 @@
           ref="password2"
           v-model="formData.repeatPassword"
           :rules="[
-            (v) => !!v || 'Repeat Password field is required',
-            (v) => v === formData.password || 'Passwords don\'t match',
+            (v) => !!v || t('auth.repeat_password_required'),
+            (v) => v === formData.password || t('auth.password_match'),
           ]"
           :type="isPasswordVisible.value ? 'text' : 'password'"
           class="mb-4"
-          label="Repeat Password"
+          :label="t('auth.repeat_password')"
           @clickAppendInner.stop="isPasswordVisible.value = !isPasswordVisible.value"
         >
           <template #appendInner>
@@ -42,7 +42,7 @@
           </template>
         </VaInput>
       </VaValue>
-      <VaButton class="w-full" @click="submit">Reset password</VaButton>
+      <VaButton class="w-full" @click="submit">{{ t('auth.reset_password') }}</VaButton>
     </VaForm>
   </VaInnerLoading>
 </template>
@@ -57,7 +57,9 @@ import { ref } from 'vue'
 import { ResetPassword } from './types'
 import { getErrorMessage } from '@/services/utils'
 import { useReCaptcha } from 'vue-recaptcha-v3'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const route = useRoute()
 const { push } = useRouter()
 const store = useAuthStore()

@@ -1,6 +1,7 @@
 import {
   ChangeEmailFormData,
   ChangePhoneNumberFormData,
+  FilterUser,
   PasswordDetailFormData,
   UserDetailsUpdate,
 } from '@/pages/user/types'
@@ -124,6 +125,17 @@ class UserService {
       .get(`/personal/resend-email-confirm`)
       .then((response) => {
         return Promise.resolve(response)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async getAllUsers(filter: FilterUser): Promise<any> {
+    return apiService
+      .post(`/users/get-all-users`, filter)
+      .then((response) => {
+        return Promise.resolve(response.data)
       })
       .catch((error) => {
         return Promise.reject(error)

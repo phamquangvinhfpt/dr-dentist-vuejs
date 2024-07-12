@@ -1,21 +1,28 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
-import { SettingProfile } from './types'
-import { SettingProfileOptions } from './UserProfile.enum'
-import { useI18n } from 'vue-i18n'
-
-const { t } = useI18n()
-
-const listSettings = ref<SettingProfile[]>([
+import { SettingShowDetail } from '../types'
+import { SettingProfile } from '@/pages/user/types.js'
+import { SettingProfileOptions } from '@/pages/user/UserProfile.enum.js'
+const listSettings = ref<SettingShowDetail[]>([
   {
     id: '1',
-    name: t('settings.general'),
-    icon: 'person',
+    name: 'Appointment',
+    icon: '',
   },
   {
     id: '2',
-    name: t('auth.change_password'),
-    icon: 'lock',
+    name: 'Prescription',
+    icon: '',
+  },
+  {
+    id: '3',
+    name: 'Follow Up Appointment',
+    icon: '',
+  },
+  {
+    id: '4',
+    name: 'Medical',
+    icon: '',
   },
 ])
 const activeOption = ref(SettingProfileOptions.General)
@@ -27,8 +34,10 @@ function selectSettingOption(item: SettingProfile) {
 }
 
 const tabs = [
-  { id: '1', name: t('settings.general'), icon: 'person' },
-  { id: '2', name: t('auth.change_password'), icon: 'lock' },
+  { id: '1', name: 'Appointment', icon: '' },
+  { id: '2', name: 'Prescription', icon: '' },
+  { id: '3', name: 'Follow up appointment', icon: '' },
+  { id: '4', name: 'Medical', icon: '' },
 ]
 
 const selectedTab = ref(tabs[0].id)

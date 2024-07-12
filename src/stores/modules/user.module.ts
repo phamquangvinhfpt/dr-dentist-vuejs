@@ -1,6 +1,7 @@
 import {
   ChangeEmailFormData,
   ChangePhoneNumberFormData,
+  FilterUser,
   PasswordDetailFormData,
   UserDetail,
   UserDetailsUpdate,
@@ -121,6 +122,27 @@ export const useUserProfileStore = defineStore('userProfile', {
         this.isLoading = true
         const response = await userService.sendVerifyEmail()
         this.isLoading = false
+        return await Promise.resolve(response)
+      } catch (error) {
+        this.isLoading = false
+        return await Promise.reject(error)
+      }
+    },
+  },
+})
+
+export const useUserStore = defineStore('users', {
+  state: () => ({
+    userDetails: [] as UserDetail[],
+    isLoading: false as boolean,
+  }),
+  actions: {
+    async getUsers(filter: FilterUser): Promise<any> {
+      try {
+        this.isLoading = true
+        const response = await userService.getAllUsers(filter)
+        this.isLoading = false
+        this.userDetails = response?.data
         return await Promise.resolve(response)
       } catch (error) {
         this.isLoading = false
