@@ -230,7 +230,8 @@
     "male": "Male",
     "female": "Female",
     "results": "results",
-    "results_per_page": "Results per page"
+    "results_per_page": "Results per page",
+    "delete": "Delete"
   },
   "treeView": {
     "basic": "Basic",
