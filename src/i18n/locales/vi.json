@@ -195,7 +195,9 @@
     "exam": "Kỳ thi",
     "assignments": "Bài tập",
     "subjects": "Môn học",
-    "usersManagement": "Quản lý người dùng"
+    "usersManagement": "Quản lý người dùng",
+    "record-list": "Danh Sách Hồ Sơ Khám",
+    "record": "Hồ sơ khám"
   },
   "messages": {
     "all": "Xem tất cả tin nhắn",

@@ -186,7 +186,9 @@
     "faq": "FAQ",
     "users": "Users",
     "projects": "Projects",
-    "usersManagement": "Users Management"
+    "usersManagement": "Users Management",
+    "record-list": "Record List",
+    "record": "Record"
   },
   "messages": {
     "all": "See all messages",

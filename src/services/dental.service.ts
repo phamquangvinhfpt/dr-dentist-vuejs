@@ -5,7 +5,6 @@ class DentalService {
     return apiService
       .get(`/DentalRecord/getRecords?pageNumber=${pageNum}`)
       .then((response) => {
-        console.log('dental.service', response)
         return Promise.resolve(response.data.message)
       })
       .catch((error) => {
@@ -26,7 +25,6 @@ class DentalService {
     return apiService
       .post('/DentalRecord/createDentalRecord', { request })
       .then((response) => {
-        console.log('res.create', response)
         return Promise.resolve(response.data)
       })
       .catch((error) => {
@@ -37,7 +35,6 @@ class DentalService {
     return apiService
       .post('/DentalRecord/getAppointmentForCreate', { id: id })
       .then((response) => {
-        console.log('res.get.app', response)
         return Promise.resolve(response.data.object)
       })
       .catch((error) => {
