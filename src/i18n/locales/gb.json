@@ -186,7 +186,9 @@
     "faq": "FAQ",
     "users": "Users",
     "projects": "Projects",
-    "usersManagement": "Users Management"
+    "usersManagement": "Users Management",
+    "record-list": "Record List",
+    "record": "Record"
   },
   "messages": {
     "all": "See all messages",
@@ -228,7 +230,8 @@
     "male": "Male",
     "female": "Female",
     "results": "results",
-    "results_per_page": "Results per page"
+    "results_per_page": "Results per page",
+    "delete": "Delete"
   },
   "treeView": {
     "basic": "Basic",

@@ -20,12 +20,10 @@ export const useDentalStore = defineStore('groupDental', {
     async GetDentalRecords(pageNum: number): Promise<DentalFilterResponse> {
       try {
         const res = await dentalService.GetAll(pageNum)
-        console.log('dental.module', res)
         this.isLoading = false
         if (res[0] && typeof res[0] === 'object') {
           this.dentals = res[0] as DentalFilterResponse
         }
-        console.log('dental.module.dentals', this.dentals)
         return Promise.resolve(this.dentals)
       } catch (error) {
         this.dentals = {} as DentalFilterResponse
