@@ -31,7 +31,7 @@ export default {
     },
     {
       name: 'record',
-      displayName: 'record',
+      displayName: 'menu.record',
       meta: {
         icon: 'vuestic-iconset-exam',
         permission: 'DentalRecords.View',
@@ -40,6 +40,10 @@ export default {
         {
           name: 'record-list',
           displayName: 'menu.record-list',
+          meta: {
+            icon: 'vuestic-iconset-exam',
+            permission: 'DentalRecords.View',
+          },
         },
       ],
     },

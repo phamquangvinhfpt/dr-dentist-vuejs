@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import { onMounted, Ref, ref, reactive } from 'vue'
 import { DentalFilterResponse, Dentals } from './types'
 
-// Import store and router
 const dentalStore = useDentalStore()
 const router = useRouter()
 
@@ -12,19 +11,14 @@ const formData = reactive({
   pageNumber: 1,
   search: '',
 })
-// Define reactive references for dental records
 const dentalRecordsFilter: Ref<DentalFilterResponse | null> = ref(null)
 const dentalRecords: Ref<Dentals[]> = ref([])
 
-// Function to fetch all dental records
 const getAllDental = async () => {
   try {
-    console.log('num', formData.pageNumber)
     const res = await dentalStore.GetDentalRecords(formData.pageNumber)
     dentalRecordsFilter.value = res
-    console.log('filter.data', dentalRecordsFilter.value)
     dentalRecords.value = dentalRecordsFilter.value.data
-    console.log('record.data', dentalRecords.value)
   } catch (error) {
     console.error('Error fetching dental records:', error)
     dentalRecordsFilter.value = null
