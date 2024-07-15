@@ -3,6 +3,7 @@ import {
   ChangePhoneNumberFormData,
   FilterUser,
   PasswordDetailFormData,
+  Roles,
   UserDetailsUpdate,
 } from '@/pages/user/types'
 import apiService from '@services/api.service'
@@ -134,6 +135,39 @@ class UserService {
   async getAllUsers(filter: FilterUser): Promise<any> {
     return apiService
       .post(`/users/get-all-users`, filter)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async updateUserRole(userId: string, roleType: Roles): Promise<any> {
+    return apiService
+      .put(`/update-user-role/${roleType}?userId=${userId}`, {})
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async lockUserAccount(userId: string): Promise<any> {
+    return apiService
+      .put(`/lock-user-account?userId=${userId}`, {})
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
+
+  async unlockUserAccount(userId: string): Promise<any> {
+    return apiService
+      .put(`/unlock-user-account?userId=${userId}`, {})
       .then((response) => {
         return Promise.resolve(response.data)
       })

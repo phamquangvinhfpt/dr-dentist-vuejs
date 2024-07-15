@@ -3,6 +3,7 @@ import {
   ChangePhoneNumberFormData,
   FilterUser,
   PasswordDetailFormData,
+  Roles,
   UserDetail,
   UserDetailsUpdate,
 } from '@/pages/user/types'
@@ -143,6 +144,44 @@ export const useUserStore = defineStore('users', {
         const response = await userService.getAllUsers(filter)
         this.isLoading = false
         this.userDetails = response?.data
+        return await Promise.resolve(response)
+      } catch (error) {
+        this.isLoading = false
+        return await Promise.reject(error)
+      }
+    },
+    async updateUserRole(userId: string, roleType: Roles): Promise<any> {
+      try {
+        this.isLoading = true
+        const response = await userService.updateUserRole(userId, roleType)
+        this.isLoading = false
+        await this.getUsers({} as FilterUser)
+        return await Promise.resolve(response)
+      } catch (error) {
+        this.isLoading = false
+        return await Promise.reject(error)
+      }
+    },
+
+    async lockUserAccount(userId: string): Promise<any> {
+      try {
+        this.isLoading = true
+        const response = await userService.lockUserAccount(userId)
+        this.isLoading = false
+        await this.getUsers({} as FilterUser)
+        return await Promise.resolve(response)
+      } catch (error) {
+        this.isLoading = false
+        return await Promise.reject(error)
+      }
+    },
+
+    async unlockUserAccount(userId: string): Promise<any> {
+      try {
+        this.isLoading = true
+        const response = await userService.unlockUserAccount(userId)
+        this.isLoading = false
+        await this.getUsers({} as FilterUser)
         return await Promise.resolve(response)
       } catch (error) {
         this.isLoading = false

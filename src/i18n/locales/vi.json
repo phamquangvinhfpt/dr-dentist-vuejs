@@ -231,6 +231,7 @@
     "explore": "Khám phá"
   },
   "user_manager": {
+    "all": "Tất cả",
     "search_placeholder": "Tìm kiếm người dùng",
     "user": "Người dùng",
     "gender": "Giới tính",
@@ -240,7 +241,17 @@
     "female": "Nữ",
     "results": "kết quả",
     "results_per_page": "Kết quả mỗi trang",
-    "delete": "Xóa"
+    "delete": "Xóa",
+    "locked": "Khóa",
+    "success_unlocked": "Mở khóa thành công",
+    "success_locked": "Khóa thành công",
+    "unlocked": "Mở khóa",
+    "role": "Vai trò",
+    "role_type": "Loại vai trò",
+    "admin": "Quản trị viên",
+    "clinic_owner": "Chủ phòng khám",
+    "dentist": "Nha sĩ",
+    "customer": "Khách hàng"
   },
   "treeView": {
     "basic": "Cơ bản",

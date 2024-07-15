@@ -222,6 +222,7 @@
     "explore": "Explore"
   },
   "user_manager": {
+    "all": "All",
     "search_placeholder": "Search users...",
     "user": "User",
     "gender": "Gender",
@@ -231,7 +232,17 @@
     "female": "Female",
     "results": "results",
     "results_per_page": "Results per page",
-    "delete": "Delete"
+    "delete": "Delete",
+    "locked": "Locked",
+    "success_unlocked": "User unlocked successfully",
+    "success_locked": "User locked successfully",
+    "unlocked": "Unlocked",
+    "role": "Role",
+    "role_type": "Role Type",
+    "admin": "Admin",
+    "clinic_owner": "Clinic Owner",
+    "dentist": "Dentist",
+    "customer": "Customer"
   },
   "treeView": {
     "basic": "Basic",

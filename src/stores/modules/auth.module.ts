@@ -65,7 +65,6 @@ export const useAuthStore = defineStore('auth', {
           roles: userParse['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
           permission: userParse.permission,
         }
-        console.log('permission', this.user.permission)
         this.avatarUrl = userParse.image_url
       } else {
         this.isAuthenticated = false
