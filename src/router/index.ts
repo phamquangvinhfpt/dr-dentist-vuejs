@@ -73,8 +73,17 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import('../pages/user/UsersManagement.vue'),
       },
+      {
+        name: 'clinic-profile',
+        path: 'clinic',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/home/Clinic/ClinicProfile.vue'),
+      },
     ],
   },
+
   {
     path: '/auth',
     component: AuthLayout,

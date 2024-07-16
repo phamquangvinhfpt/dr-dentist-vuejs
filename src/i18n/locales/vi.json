@@ -239,7 +239,8 @@
     "male": "Nam",
     "female": "Nữ",
     "results": "kết quả",
-    "results_per_page": "Kết quả mỗi trang"
+    "results_per_page": "Kết quả mỗi trang",
+    "delete": "Xóa"
   },
   "treeView": {
     "basic": "Cơ bản",

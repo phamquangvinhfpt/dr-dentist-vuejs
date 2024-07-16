@@ -38,64 +38,11 @@ const handleSearchChange = (e: any) => {
         <VaCard class="flex gap-2">
           <div class="flex flex-row gap-2 justify-end">
             <VaButton v-if="selectedItems.length != 0" icon="delete" color="danger" @click="deleteSelectedUser()">
-              Delete</VaButton
+              {{ t('user_manager.delete') }}</VaButton
             >
           </div>
-          <VaDropdown placement="bottom-end">
-            <template #anchor>
-              <VaButton icon="filter_alt" />
-            </template>
-            <VaDropdownContent class="p-0">
-              <!-- <VaButton
-                preset="secondary"
-                size="small"
-                style="width: 100%"
-                class="p-2"
-                :icon="folderPermissionType == 0 ? 'check' : ''"
-                @click="folderPermissionType = 0"
-                >{{ t('questionFolder.all') }}</VaButton
-              > -->
-            </VaDropdownContent>
-            <VaDropdownContent class="p-0">
-              <!-- <VaButton
-                preset="secondary"
-                size="small"
-                style="width: 100%"
-                class="p-2"
-                :icon="folderPermissionType == 1 ? 'check' : ''"
-                @click="folderPermissionType = 1"
-                >{{ t('questionFolder.my_documents') }}</VaButton
-              > -->
-            </VaDropdownContent>
-            <VaDropdownContent class="p-0">
-              <!-- <VaButton
-                preset="secondary"
-                size="small"
-                style="width: 100%"
-                class="p-2"
-                :icon="folderPermissionType == 2 ? 'check' : ''"
-                @click="folderPermissionType = 2"
-                >{{ t('questionFolder.shared_documents') }}</VaButton
-              > -->
-            </VaDropdownContent>
-          </VaDropdown>
         </VaCard>
       </VaCard>
     </VaCard>
-    <!-- <VaCardContent class="pb-0">
-      <QuestionFolder
-        v-model:selectedItemsEmitted="selectedItemsEmitted"
-        :question-trees="questionTreesFiltered"
-        :loading="loading"
-        :total-questions="totalQuestions"
-        :current-show-folder-id="currentShowFolderId"
-        :mode="props.mode"
-        @edit="editQuestionTree"
-        @delete="deleteQuestionTreeOne"
-        @selectedFolder="selectedFolder"
-        @share="shareQuestionTree"
-        @viewQuestions="showQuestions"
-      />
-    </VaCardContent> -->
   </VaCard>
 </template>
