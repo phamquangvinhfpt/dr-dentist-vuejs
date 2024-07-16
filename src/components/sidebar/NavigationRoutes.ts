@@ -47,5 +47,21 @@ export default {
         },
       ],
     },
+    {
+      name: 'dentist',
+      displayName: 'menu.dentist',
+      meta: {
+        icon: 'vuestic-iconset-dentist',
+      },
+      children: [
+        {
+          name: 'dentist-list',
+          displayName: 'menu.dentist-list',
+          meta: {
+            icon: 'vuestic-iconset-exam',
+          },
+        },
+      ],
+    },
   ] as INavigationRoute[],
 }

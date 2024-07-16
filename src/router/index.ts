@@ -58,6 +58,21 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
       {
+        name: 'dentist',
+        path: 'dentist',
+        meta: {
+          requiresAuth: true,
+        },
+        component: RouteViewComponent,
+        children: [
+          {
+            name: 'dentist-list',
+            path: 'all',
+            component: () => import('../pages/dentist/GetAllDentist.vue'),
+          },
+        ],
+      },
+      {
         name: 'notifications',
         path: 'notification',
         meta: {
