@@ -96,7 +96,7 @@ const emailRules: ((v: string) => boolean | string)[] = [
       </p>
       <VaInput
         v-model="formData.fullName"
-        :rules="[(v: any) => !!v || t('auth_full_name_required'), ...fullnameRules]"
+        :rules="[(v: any) => !!v || t('auth.full_name_required'), ...fullnameRules]"
         class="mb-4"
         :label="t('auth.full_name')"
       />

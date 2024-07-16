@@ -3,8 +3,12 @@ import { useUserStore } from '@/stores/modules/user.module'
 import { PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { getErrorMessage, notifications } from '@/services/utils'
-import { useToast } from 'vuestic-ui'
+import { useModal, useToast } from 'vuestic-ui'
+import { useEventBus } from '@vueuse/core'
+import { USER_DELETED_EVENT } from '../types'
+
 const { t } = useI18n()
+const { confirm } = useModal()
 const UserStore = useUserStore()
 const { init: notify } = useToast()
 const selectedItems = defineModel('selectedItem', {
@@ -17,8 +21,45 @@ const searchTerm = defineModel('searchTerm', {
   default: '',
 })
 
-const deleteSelectedUser = () => {
-  console.log('deleteSelectedUser', selectedItems.value[0].id)
+const deleteSelectedUser = async () => {
+  const user = selectedItems.value[0]
+  const confirmDelete = await confirm({
+    title: t('user_manager.delete_user'),
+    message: t('user_manager.delete_user_confirm', { name: user.fullName }),
+    okText: t('user_manager.delete'),
+    cancelText: t('user_manager.cancel'),
+    backgroundColor: 'background-secondary',
+  })
+  if (confirmDelete) {
+    try {
+      await UserStore.deleteUserAccount(user.id).then((response) => {
+        if (response.succeeded) {
+          notify({
+            message: notifications.deleteSuccessfully(t('user_manager.user')),
+            color: 'success',
+          })
+        } else {
+          notify({
+            message: notifications.deleteFailed(t('user_manager.user')),
+            color: 'error',
+          })
+        }
+      })
+      selectedItems.value = selectedItems.value.filter((item) => item.id !== user.id)
+
+      useEventBus(USER_DELETED_EVENT).emit()
+    } catch (error) {
+      notify({
+        message: notifications.deleteFailed(t('user_manager.user')) + getErrorMessage(error),
+        color: 'error',
+      })
+    }
+  } else {
+    notify({
+      message: t('user_manager.delete_cancelled'),
+      color: 'info',
+    })
+  }
 }
 
 const toggleUserLock = async () => {

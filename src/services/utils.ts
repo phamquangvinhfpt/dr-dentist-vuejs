@@ -97,7 +97,6 @@ export const notifications = {
 }
 
 export const getErrorMessage = (error: any): string => {
-  console.log(error)
   if (error.response && error.response.data) {
     const { data } = error.response
 

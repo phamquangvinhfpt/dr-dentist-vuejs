@@ -175,5 +175,16 @@ class UserService {
         return Promise.reject(error)
       })
   }
+
+  async deleteUserAccount(userId: string): Promise<any> {
+    return apiService
+      .delete(`/users/delete-user-account?userId=${userId}`)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 export default new UserService()

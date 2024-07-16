@@ -103,3 +103,5 @@ export type PagingUser = {
   previousPage?: string
   nextPage?: string
 }
+
+export const USER_DELETED_EVENT = 'userDeleted'

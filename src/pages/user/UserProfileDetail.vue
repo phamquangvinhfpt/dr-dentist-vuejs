@@ -102,7 +102,6 @@ const formDataChangePassword = reactive({ ...passwordDetail.value })
 const formDataChangePhoneNumber = reactive({ phoneNumber: '', password: '' })
 const formDataChangePhoneOTP = reactive({ otpCode: '' })
 const formDataChangeEmail = reactive({ email: '', password: '' })
-console.log('userForm', formData.fullName)
 const phoneNumberRules: ((v: string) => boolean | string)[] = [
   (v) => !!v || t('auth.phone_number_required'),
   (v) => (v && v.length >= 10) || t('auth.phone_number_min_length'),

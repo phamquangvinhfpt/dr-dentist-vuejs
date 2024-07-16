@@ -30,7 +30,6 @@ watch(
   () => dataFilter.value.searchTerm,
   (newVal) => {
     dataFilter.value.searchTerm = newVal
-    console.log('searchTerm', dataFilter.value.searchTerm)
   },
 )
 </script>

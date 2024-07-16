@@ -102,12 +102,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, PropType, ref } from 'vue'
-import { PagingUser, Roles, UserDetail } from '@/pages/user/types'
+import { computed, onMounted, onUnmounted, PropType, ref } from 'vue'
+import { PagingUser, Roles, USER_DELETED_EVENT, UserDetail } from '@/pages/user/types'
 import { useUserStore } from '@/stores/modules/user.module'
 import { getErrorMessage, notifications } from '@/services/utils'
 import { useToast } from 'vuestic-ui'
-import { watchDebounced } from '@vueuse/core'
+import { useEventBus, watchDebounced } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -324,6 +324,17 @@ onMounted(() => {
     ...props.filterQueries,
   }
   getUsers(queries)
+  const { on, off } = useEventBus(USER_DELETED_EVENT)
+
+  const updateUserList = () => {
+    getUsers(queries)
+  }
+
+  on(updateUserList)
+
+  onUnmounted(() => {
+    off(updateUserList)
+  })
 })
 </script>
 <style lang="scss" scoped>

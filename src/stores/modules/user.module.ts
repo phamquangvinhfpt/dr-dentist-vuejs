@@ -188,5 +188,18 @@ export const useUserStore = defineStore('users', {
         return await Promise.reject(error)
       }
     },
+
+    async deleteUserAccount(userId: string): Promise<any> {
+      try {
+        this.isLoading = true
+        const response = await userService.deleteUserAccount(userId)
+        this.isLoading = false
+        await this.getUsers({} as FilterUser)
+        return await Promise.resolve(response)
+      } catch (error) {
+        this.isLoading = false
+        return await Promise.reject(error)
+      }
+    },
   },
 })
