@@ -11,9 +11,17 @@ class DentalService {
         return Promise.reject(error)
       })
   }
-  async GetAllAndSearch(pageNum: number, pageSize: number, searchTerm: string): Promise<any> {
+  async GetAllAndSearch(
+    pageNum: number,
+    pageSize: number,
+    searchTerm: string,
+    sortOrder: string,
+    sortBy: string,
+  ): Promise<any> {
     return apiService
-      .get(`/DentalRecord/getRecords?PageNumber=${pageNum}&PageSize=${pageSize}&SearchTerm=${searchTerm}`)
+      .get(
+        `/DentalRecord/getRecords?PageNumber=${pageNum}&PageSize=${pageSize}&SearchTerm=${searchTerm}&SortOrder=${sortOrder}&SortBy=${sortBy}`,
+      )
       .then((response) => {
         return Promise.resolve(response.data.message)
       })

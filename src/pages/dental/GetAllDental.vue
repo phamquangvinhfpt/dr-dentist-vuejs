@@ -11,23 +11,25 @@ const formData = reactive({
   pageNumber: 1,
   searchTerm: '',
   pageSize: 10,
+  sortDesc: false,
+  sortBy: '',
 })
 const dentalRecordsFilter: Ref<DentalFilterResponse | null> = ref(null)
 const dentalRecords: Ref<Dentals[]> = ref([])
 
-const getAllDental = async () => {
-  try {
-    const res = await dentalStore.GetDentalRecords(formData.pageNumber, formData.pageSize)
-    dentalRecordsFilter.value = res
-    dentalRecords.value = dentalRecordsFilter.value.data
-  } catch (error) {
-    console.error('Error fetching dental records:', error)
-    dentalRecordsFilter.value = null
-  }
-}
 const getAllDentalAndSearch = async () => {
   try {
-    const res = await dentalStore.GetDentalRecordAndSearch(formData.pageNumber, formData.pageSize, formData.searchTerm)
+    let sortOrder = 'asc'
+    if (formData.sortDesc) {
+      sortOrder = 'desc'
+    }
+    const res = await dentalStore.GetDentalRecordAndSearch(
+      formData.pageNumber,
+      formData.pageSize,
+      formData.searchTerm,
+      sortOrder,
+      formData.sortBy,
+    )
     dentalRecordsFilter.value = res
     dentalRecords.value = dentalRecordsFilter.value.data
   } catch (error) {
@@ -63,6 +65,12 @@ const columns = computed(() => [
   { key: 'status', label: 'Status' },
   { key: 'action', label: 'Action' },
 ])
+const sortOptions = [
+  { value: 'dentist', text: 'Dentist' },
+  { value: 'createdAt', text: 'Create At' },
+  { value: 'patient', text: 'Patient' },
+  { value: 'type', text: 'Type' },
+]
 const viewDetails = (id: string) => {
   dentalStore.id = id
   router.push({ name: 'detail' })
@@ -71,7 +79,7 @@ watch(
   () => formData.pageSize,
   (newPageSize) => {
     formData.pageSize = newPageSize
-    getAllDental()
+    getAllDentalAndSearch()
   },
 )
 watch(
@@ -81,22 +89,51 @@ watch(
     getAllDentalAndSearch()
   },
 )
+watch(
+  () => dentalRecordsFilter.value?.pageNumber,
+  (newPage) => {
+    formData.pageNumber = newPage as number
+    getAllDentalAndSearch()
+  },
+)
+watch(
+  () => formData.sortBy,
+  (newSortBy) => {
+    formData.sortBy = newSortBy
+    getAllDentalAndSearch()
+  },
+)
+watch(
+  () => formData.sortDesc,
+  (newSortDesc) => {
+    formData.sortDesc = newSortDesc
+    getAllDentalAndSearch()
+  },
+)
 onMounted(() => {
-  getAllDental()
+  getAllDentalAndSearch()
 })
 </script>
 
 <template>
   <div class="grid sm:grid-cols-2 md:grid-cols-5 gap-6 mb-6">
     <VaInput v-model="formData.searchTerm" class="sm:col-span-2 md:col-span-3" placeholder="Search: " />
+    <VaSelect
+      v-model="formData.sortBy"
+      class="sm:col-span-1 md:col-span-1"
+      :options="sortOptions.map((option) => option.value)"
+      placeholder="Order By"
+    />
+    <div class="sm:col-span-1 md:col-span-1 flex items-center">
+      <label class="mr-2">Descreasing</label>
+      <input v-model="formData.sortDesc" type="checkbox" />
+    </div>
   </div>
   <VaDataTable
     class="my-table va-table--hoverable"
     :items="dentalRecords"
     :columns="columns"
     hoverable
-    clickable
-    selectable
     select-mode="multiple"
     :disable-client-side-sorting="false"
     :style="{
@@ -155,7 +192,6 @@ onMounted(() => {
           :visible-pages="5"
           :boundary-links="true"
           :direction-links="true"
-          @update:modelValue="getAllDental"
         />
       </div>
     </div>

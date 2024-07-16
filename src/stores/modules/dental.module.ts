@@ -34,9 +34,11 @@ export const useDentalStore = defineStore('groupDental', {
       pageNum: number,
       pageSize: number,
       searchTerm: string,
+      sortOrder: string,
+      sortBy: string,
     ): Promise<DentalFilterResponse> {
       try {
-        const res = await dentalService.GetAllAndSearch(pageNum, pageSize, searchTerm)
+        const res = await dentalService.GetAllAndSearch(pageNum, pageSize, searchTerm, sortOrder, sortBy)
         this.isLoading = false
         if (res[0] && typeof res[0] === 'object') {
           this.dentals = res[0] as DentalFilterResponse
