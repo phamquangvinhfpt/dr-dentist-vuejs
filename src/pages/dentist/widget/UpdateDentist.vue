@@ -1,14 +1,14 @@
 <template>
-  <div class="create-dentist-container">
-    <h1>Create Dentist</h1>
+  <div class="update-dentist-container">
+    <h1>Update Dentist</h1>
 
     <!-- Loading Indicator -->
-    <div v-if="isLoading" class="loading">Creating...</div>
+    <div v-if="isLoading" class="loading">Updating...</div>
 
     <!-- Error Message -->
     <div v-if="error" class="error">{{ error }}</div>
 
-    <!-- Create Dentist Form -->
+    <!-- Update Dentist Form -->
     <form @submit.prevent="submitForm">
       <!-- Form fields for dentist details -->
       <input v-model="dentist.clinicId" placeholder="Clinic ID" required />
@@ -17,47 +17,48 @@
       <input v-model="dentist.specialization" placeholder="Specialization" required />
       <input v-model.number="dentist.yearOfExperience" type="number" placeholder="Years of Experience" required />
 
-      <button type="submit">Create Dentist</button>
+      <button type="submit">Update Dentist</button>
     </form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, computed } from 'vue'
+import { defineComponent, reactive, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useDentistStore } from '@/stores/modules/dentist.module'
-import { v4 as uuidv4 } from 'uuid' // Sử dụng thư viện UUID để tạo ID nếu cần
 
 export default defineComponent({
-  name: 'CreateDentist',
+  name: 'UpdateDentist',
   setup() {
+    const route = useRoute()
     const dentistStore = useDentistStore()
     const dentist = reactive({
-      dentistId: '', // Thêm thuộc tính dentistId
-      clinicId: '',
+      dentistId: route.params.id as string,
+      clinicId: '', // Ensure clinicId is included
       degree: '',
       institute: '',
       specialization: '',
       yearOfExperience: 0,
     })
 
-    const submitForm = async () => {
+    const loadDentist = async () => {
       try {
-        // Nếu cần, bạn có thể tạo dentistId tự động hoặc để API sinh ra
-        dentist.dentistId = uuidv4() // Thay đổi theo cách bạn quản lý ID
-        await dentistStore.createDentist(dentist)
-        // Reset form after successful creation
-        Object.assign(dentist, {
-          dentistId: '',
-          clinicId: '',
-          degree: '',
-          institute: '',
-          specialization: '',
-          yearOfExperience: 0,
-        })
+        const dentistData = await dentistStore.getDentistById(dentist.dentistId)
+        Object.assign(dentist, dentistData)
       } catch (err) {
-        dentistStore.setError('Failed to create dentist.')
+        dentistStore.setError('Failed to load dentist.')
       }
     }
+
+    const submitForm = async () => {
+      try {
+        await dentistStore.updateDentist(dentist)
+      } catch (err) {
+        dentistStore.setError('Failed to update dentist.')
+      }
+    }
+
+    onMounted(loadDentist)
 
     return {
       dentist,
@@ -70,7 +71,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.create-dentist-container {
+.update-dentist-container {
   padding: 20px;
   font-family: Arial, sans-serif;
 }

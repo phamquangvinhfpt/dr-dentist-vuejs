@@ -3,6 +3,6 @@ export interface DentistDetails {
   clinicId: string
   degree: string
   institute: string
-  yearOfExperience: number
   specialization: string
+  yearOfExperience: number
 }

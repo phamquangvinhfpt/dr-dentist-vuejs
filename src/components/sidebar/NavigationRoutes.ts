@@ -61,6 +61,27 @@ export default {
             icon: 'vuestic-iconset-exam',
           },
         },
+        {
+          name: 'create-dentist',
+          displayName: 'menu.create-dentist',
+          meta: {
+            icon: 'vuestic-iconset-plus',
+          },
+        },
+        {
+          name: 'update-dentist',
+          displayName: 'menu.update-dentist',
+          meta: {
+            icon: 'vuestic-iconset-edit',
+          },
+        },
+        {
+          name: 'delete-dentist',
+          displayName: 'menu.delete-dentist',
+          meta: {
+            icon: 'vuestic-iconset-delete',
+          },
+        },
       ],
     },
   ] as INavigationRoute[],

@@ -70,6 +70,22 @@ const routes: Array<RouteRecordRaw> = [
             path: 'all',
             component: () => import('../pages/dentist/GetAllDentist.vue'),
           },
+          {
+            name: 'create-dentist',
+            path: 'create',
+            component: () => import('../pages/dentist/widget/CreateDentist.vue'),
+          },
+          {
+            name: 'update-dentist',
+            path: 'update',
+            component: () => import('../pages/dentist/widget/UpdateDentist.vue'),
+          },
+          {
+            name: 'delete-dentist',
+            path: 'delete',
+            component: () => import('../pages/dentist/widget/DeleteDentist.vue'),
+            props: true, // Pass route params as props
+          },
         ],
       },
       {
