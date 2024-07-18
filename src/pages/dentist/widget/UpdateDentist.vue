@@ -11,6 +11,7 @@
     <!-- Update Dentist Form -->
     <form @submit.prevent="submitForm">
       <!-- Form fields for dentist details -->
+      <input v-model="dentist.dentistId" placeholder="Dentist ID" required readonly />
       <input v-model="dentist.clinicId" placeholder="Clinic ID" required />
       <input v-model="dentist.degree" placeholder="Degree" required />
       <input v-model="dentist.institute" placeholder="Institute" required />
@@ -22,52 +23,48 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, reactive, computed, onMounted } from 'vue'
+<script lang="ts" setup>
+import { reactive, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useDentistStore } from '@/stores/modules/dentist.module'
+import { DentistDetails } from '@/pages/dentist/types'
 
-export default defineComponent({
-  name: 'UpdateDentist',
-  setup() {
-    const route = useRoute()
-    const dentistStore = useDentistStore()
-    const dentist = reactive({
-      dentistId: route.params.id as string,
-      clinicId: '', // Ensure clinicId is included
-      degree: '',
-      institute: '',
-      specialization: '',
-      yearOfExperience: 0,
-    })
+const route = useRoute()
+const dentistStore = useDentistStore()
 
-    const loadDentist = async () => {
-      try {
-        const dentistData = await dentistStore.getDentistById(dentist.dentistId)
-        Object.assign(dentist, dentistData)
-      } catch (err) {
-        dentistStore.setError('Failed to load dentist.')
-      }
-    }
-
-    const submitForm = async () => {
-      try {
-        await dentistStore.updateDentist(dentist)
-      } catch (err) {
-        dentistStore.setError('Failed to update dentist.')
-      }
-    }
-
-    onMounted(loadDentist)
-
-    return {
-      dentist,
-      isLoading: computed(() => dentistStore.isLoading),
-      error: computed(() => dentistStore.error),
-      submitForm,
-    }
-  },
+const dentist = reactive<DentistDetails>({
+  dentistId: route.query.id as string,
+  clinicId: '',
+  degree: '',
+  institute: '',
+  specialization: '',
+  yearOfExperience: 0,
 })
+
+console.log('Dentist ID from route query:', route.query.id)
+
+const loadDentist = async () => {
+  try {
+    const dentistData = await dentistStore.getDentistById(dentist.dentistId)
+    console.log('Loaded Dentist Data:', dentistData)
+    Object.assign(dentist, dentistData)
+  } catch (err) {
+    dentistStore.setError('Failed to load dentist.')
+  }
+}
+
+const submitForm = async () => {
+  try {
+    await dentistStore.updateDentist(dentist)
+  } catch (err) {
+    dentistStore.setError('Failed to update dentist.')
+  }
+}
+
+onMounted(loadDentist)
+
+const isLoading = computed(() => dentistStore.isLoading)
+const error = computed(() => dentistStore.error)
 </script>
 
 <style scoped>

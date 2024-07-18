@@ -77,7 +77,7 @@ const routes: Array<RouteRecordRaw> = [
           },
           {
             name: 'update-dentist',
-            path: 'update',
+            path: '/update',
             component: () => import('../pages/dentist/widget/UpdateDentist.vue'),
           },
           {

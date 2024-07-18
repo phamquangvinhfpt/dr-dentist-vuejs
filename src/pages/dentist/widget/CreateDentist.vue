@@ -11,6 +11,7 @@
     <!-- Create Dentist Form -->
     <form @submit.prevent="submitForm">
       <!-- Form fields for dentist details -->
+      <input v-model="dentist.dentistId" placeholder="Dentist ID" required />
       <input v-model="dentist.clinicId" placeholder="Clinic ID" required />
       <input v-model="dentist.degree" placeholder="Degree" required />
       <input v-model="dentist.institute" placeholder="Institute" required />
@@ -25,14 +26,14 @@
 <script lang="ts">
 import { defineComponent, reactive, computed } from 'vue'
 import { useDentistStore } from '@/stores/modules/dentist.module'
-import { v4 as uuidv4 } from 'uuid' // Sử dụng thư viện UUID để tạo ID nếu cần
+import { DentistDetails } from '@/pages/dentist/types'
 
 export default defineComponent({
   name: 'CreateDentist',
   setup() {
     const dentistStore = useDentistStore()
-    const dentist = reactive({
-      dentistId: '', // Thêm thuộc tính dentistId
+    const dentist = reactive<DentistDetails>({
+      dentistId: '', // Add id property here
       clinicId: '',
       degree: '',
       institute: '',
@@ -42,18 +43,7 @@ export default defineComponent({
 
     const submitForm = async () => {
       try {
-        // Nếu cần, bạn có thể tạo dentistId tự động hoặc để API sinh ra
-        dentist.dentistId = uuidv4() // Thay đổi theo cách bạn quản lý ID
         await dentistStore.createDentist(dentist)
-        // Reset form after successful creation
-        Object.assign(dentist, {
-          dentistId: '',
-          clinicId: '',
-          degree: '',
-          institute: '',
-          specialization: '',
-          yearOfExperience: 0,
-        })
       } catch (err) {
         dentistStore.setError('Failed to create dentist.')
       }
