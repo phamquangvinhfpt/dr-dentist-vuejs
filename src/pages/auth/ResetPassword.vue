@@ -50,7 +50,7 @@
 <script lang="ts" setup>
 import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
-import { reactive } from 'vue'
+import { onBeforeMount, reactive } from 'vue'
 import { useForm, useToast } from 'vuestic-ui'
 import { useAuthStore } from '@/stores/modules/auth.module'
 import { ref } from 'vue'
@@ -123,4 +123,11 @@ const passwordRules: ((v: string) => boolean | string)[] = [
   (v) => (v && /\d/.test(v)) || 'Password must contain at least one number',
   (v) => (v && /[!@#$%^&*(),.?":{}|<>]/.test(v)) || 'Password must contain at least one special character',
 ]
+
+onBeforeMount(() => {
+  if (store.isAuthenticated) {
+    push({ name: 'dashboard' })
+    init({ message: 'You are already logged in', color: 'success', position: 'bottom-right' })
+  }
+})
 </script>

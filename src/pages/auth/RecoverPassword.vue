@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { useForm, useToast } from 'vuestic-ui'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/modules/auth.module'
@@ -25,6 +25,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 const email = ref('')
+const { push } = useRouter()
 const form = useForm('passwordForm')
 const router = useRouter()
 const store = useAuthStore()
@@ -59,4 +60,11 @@ const submit = async () => {
       })
   }
 }
+
+onBeforeMount(() => {
+  if (store.isAuthenticated) {
+    push({ name: 'dashboard' })
+    init({ message: 'You are already logged in', color: 'success', position: 'bottom-right' })
+  }
+})
 </script>

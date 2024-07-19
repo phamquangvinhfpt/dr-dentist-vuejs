@@ -25,13 +25,15 @@
 </template>
 
 <script lang="ts" setup>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/modules/auth.module'
-import { ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
+import { useToast } from 'vuestic-ui/web-components'
 
 const route = useRoute()
 const store = useAuthStore()
-
+const { push } = useRouter()
+const { init } = useToast()
 const userId = route.query.userId as string
 const code = route.query.token as string
 
@@ -49,4 +51,11 @@ store
   .finally(() => {
     isLoading.value = false
   })
+
+onBeforeMount(() => {
+  if (store.isAuthenticated) {
+    push({ name: 'dashboard' })
+    init({ message: 'You are already logged in', color: 'success', position: 'bottom-right' })
+  }
+})
 </script>

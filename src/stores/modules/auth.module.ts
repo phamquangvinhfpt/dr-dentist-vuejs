@@ -41,6 +41,7 @@ export const Resource = {
   MedicalRecords: 'MedicalRecords',
   Prescriptions: 'Prescriptions',
   Appointments: 'Appointments',
+  AuditLogs: 'AuditLogs',
 }
 
 export const useAuthStore = defineStore('auth', {

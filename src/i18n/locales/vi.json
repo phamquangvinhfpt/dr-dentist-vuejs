@@ -118,6 +118,29 @@
     "settings_updated_successfully": "Cài đặt được cập nhật thành công",
     "general": "Chung"
   },
+  "auditLogs": {
+    "title": "Nhật ký",
+    "form": {
+      "actionType": "Loại Hành Động",
+      "resourceType": "Loại Tài Nguyên"
+    },
+    "table": {
+      "buttonDetails": "Xem chi tiết",
+      "titleDetails": "Chi Tiết Nhật Ký",
+      "buttonCloseDetails": "Đóng",
+      "item": "bản ghi",
+      "items": "bản ghi",
+      "userCol": "người dùng",
+      "resourceCol": "tài nguyên",
+      "actionCol": "hành động",
+      "createdAtCol": "thời gian",
+      "viewDetailsCol": "xem chi tiết"
+    },
+    "details": {
+      "oldData": "Dữ Liệu Cũ",
+      "newData": "Dữ Liệu Mới"
+    }
+  },
   "validation": {
     "password": {
       "required": "Trường mật khẩu là bắt buộc",
@@ -197,7 +220,8 @@
     "subjects": "Môn học",
     "usersManagement": "Quản lý người dùng",
     "record-list": "Danh Sách Hồ Sơ Khám",
-    "record": "Hồ sơ khám"
+    "record": "Hồ sơ khám",
+    "audit-logs": "Nhật ký"
   },
   "messages": {
     "all": "Xem tất cả tin nhắn",
