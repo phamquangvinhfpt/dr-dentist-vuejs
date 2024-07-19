@@ -1,6 +1,6 @@
 <template>
   <div class="dentist-container">
-    <h1>Available Dentists</h1>
+    <p style="font-weight: bold; margin-bottom: 15px; font-size: 24px; text-align: center">Available Dentists</p>
 
     <!-- Loading Indicator -->
     <div v-if="isLoading" class="loading">Loading...</div>
@@ -13,30 +13,32 @@
 
     <!-- Dentists List -->
     <ul v-if="!isLoading && !error">
-      <li v-for="dentist in dentists" :key="dentist.dentistId" class="dentist-item">
+      <li v-for="dentist in dentists" :key="dentist.Id" class="dentist-item">
         <div class="dentist-info">
-          <p><strong>Dentist ID:</strong> {{ dentist.dentistId }}</p>
-          <p><strong>Clinic ID:</strong> {{ dentist.clinicId }}</p>
           <p><strong>Degree:</strong> {{ dentist.degree }}</p>
           <p><strong>Institute:</strong> {{ dentist.institute }}</p>
           <p><strong>Specialization:</strong> {{ dentist.specialization }}</p>
           <p><strong>Years of Experience:</strong> {{ dentist.yearOfExperience }}</p>
         </div>
-        <button class="delete-btn" @click="confirmDelete(dentist.dentistId)">Delete</button>
+        <button class="delete-btn" @click="confirmDelete(dentist.Id)">Delete</button>
       </li>
     </ul>
 
     <!-- Update Form -->
     <div v-if="showUpdateForm" class="update-form">
-      <h2>Update Dentist</h2>
+      <p style="font-weight: bold; margin-bottom: 15px; font-size: 24px">Update Dentist</p>
       <form @submit.prevent="submitForm">
         <label>
           Dentist ID:
           <input v-model="dentist.dentistId" type="text" readonly />
         </label>
         <label>
+          Dentist Detail ID:
+          <input v-model="dentist.Id" type="text" readonly />
+        </label>
+        <label>
           Clinic ID:
-          <input v-model="dentist.clinicId" type="text" />
+          <input v-model="dentist.clinicId" type="text" readonly />
         </label>
         <label>
           Degree:
@@ -63,6 +65,7 @@
 <script lang="ts">
 import { defineComponent, computed, onMounted, reactive, ref } from 'vue'
 import { useDentistStore } from '@/stores/modules/dentist.module'
+import { DentistDetails } from '../types'
 
 export default defineComponent({
   name: 'GetAllDentists',
@@ -77,8 +80,9 @@ export default defineComponent({
       }
     }
 
-    const dentist = reactive({
+    const dentist = reactive<DentistDetails>({
       dentistId: '',
+      Id: '',
       clinicId: '',
       degree: '',
       institute: '',
@@ -88,62 +92,60 @@ export default defineComponent({
 
     const showUpdateForm = ref(false)
     const successMessage = ref('')
+    const errorMessage = computed(() => dentistStore.error)
 
-    const openUpdateForm = (selectedDentist: any) => {
+    const openUpdateForm = (selectedDentist: DentistDetails) => {
       Object.assign(dentist, selectedDentist)
       showUpdateForm.value = true
     }
 
     const submitForm = async () => {
+      const confirmUpdate = confirm('Are you sure you want to update this dentist?')
+      if (confirmUpdate) {
+        try {
+          await dentistStore.updateDentist(dentist)
+          successMessage.value = 'Updated Successfully'
+          showUpdateForm.value = false
+          setTimeout(() => {
+            successMessage.value = ''
+          }, 2000)
+        } catch (err) {
+          dentistStore.setError('Failed to update dentist.')
+        }
+      }
+    }
+
+    const confirmDelete = (dentistDetailID: string) => {
+      if (confirm('Are you sure you want to delete this dentist?')) {
+        deleteDentist(dentistDetailID)
+      }
+    }
+
+    const deleteDentist = async (dentistDetailID: string) => {
       try {
-        await dentistStore.updateDentist(dentist)
-        successMessage.value = 'Updated Successfully'
-        showUpdateForm.value = false
+        await dentistStore.deleteDentist(dentistDetailID)
+        successMessage.value = 'Deleted Successfully'
+        await fetchDentists()
         setTimeout(() => {
           successMessage.value = ''
         }, 5000)
       } catch (err) {
-        dentistStore.setError('Failed to update dentist.')
-      }
-    }
-
-    const confirmDelete = (id: string) => {
-      if (confirm('Are you sure you want to delete this dentist?')) {
-        deleteDentist(id)
-      }
-    }
-
-    const deleteDentist = async (id: string) => {
-      console.log('Attempting to delete dentist with ID:', id)
-      try {
-        await dentistStore.deleteDentist(id)
-        console.log('Dentist deleted successfully')
-        successMessage.value = 'Deleted Successfully'
-        // Check the current list of dentists after deletion
-        console.log('Current list of dentists:', dentistStore.dentists)
-        await dentistStore.getDentists()
-        console.log('Fetched dentists after deletion:', dentistStore.dentists)
-        setTimeout(() => {
-          successMessage.value = ''
-        }, 2000)
-      } catch (err) {
-        console.error('Failed to delete dentist:', err)
         dentistStore.setError('Failed to delete dentist.')
       }
     }
+
     onMounted(fetchDentists)
 
     return {
       dentists: computed(() => dentistStore.dentists),
       isLoading: computed(() => dentistStore.isLoading),
-      error: computed(() => dentistStore.error),
+      error: errorMessage,
+      successMessage,
       dentist,
       showUpdateForm,
-      successMessage,
       openUpdateForm,
       submitForm,
       confirmDelete,
-      deleteDentist,
     }
   },
 })

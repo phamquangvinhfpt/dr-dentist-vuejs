@@ -39,6 +39,7 @@ const dentist = reactive<DentistDetails>({
   institute: '',
   specialization: '',
   yearOfExperience: 0,
+  Id: '',
 })
 
 console.log('Dentist ID from route query:', route.query.id)

@@ -1,6 +1,5 @@
 import { DentistDetails } from '@/pages/dentist/types'
 import apiService from '@services/api.service'
-import { AxiosError } from 'axios'
 
 class DentistService {
   // Fetch all dentists with pagination
@@ -52,22 +51,23 @@ class DentistService {
   }
 
   // Delete a dentist by ID
-  async deleteDentist(id: string): Promise<void> {
+  async deleteDentist(dentistDetailID: string): Promise<void> {
     try {
-      await apiService.delete(`/Dentist/${id}`)
-      console.log(`Deleted dentist with ID ${id}`)
+      await apiService.delete(`/Dentist/${dentistDetailID}`)
+      console.log(`Deleted dentist with ID ${dentistDetailID}`)
     } catch (error) {
-      console.error(`Error deleting dentist with ID ${id}:`, this.formatError(error))
+      console.error(`Error deleting dentist with ID ${dentistDetailID}:`, error)
       throw error
     }
   }
 
   // Utility function to format error messages
-  private formatError(error: any): string {
-    if (error instanceof AxiosError) {
-      return error.response?.data?.message || error.message
+  formatError(error: any): string {
+    if (error.response && error.response.data && error.response.data.message) {
+      return error.response.data.message
+    } else {
+      return error.message
     }
-    return error.message || 'An unexpected error occurred'
   }
 }
 

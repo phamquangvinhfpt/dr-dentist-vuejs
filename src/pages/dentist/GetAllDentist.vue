@@ -13,7 +13,7 @@
 
     <!-- Dentists List -->
     <ul v-if="!isLoading && !error">
-      <li v-for="dentist in dentists" :key="dentist.dentistId" class="dentist-item">
+      <li v-for="dentist in dentists" :key="dentist.Id" class="dentist-item">
         <div class="dentist-info">
           <p><strong>Degree:</strong> {{ dentist.degree }}</p>
           <p><strong>Institute:</strong> {{ dentist.institute }}</p>
@@ -32,9 +32,13 @@
           Dentist ID:
           <input v-model="dentist.dentistId" type="text" readonly />
         </label>
+        <!-- <label>
+          Dentist Detail ID:
+          <input v-model="dentist.Id" type="text" readonly />
+        </label> -->
         <label>
           Clinic ID:
-          <input v-model="dentist.clinicId" type="text" />
+          <input v-model="dentist.clinicId" type="text" readonly />
         </label>
         <label>
           Degree:
@@ -61,6 +65,7 @@
 <script lang="ts">
 import { defineComponent, computed, onMounted, reactive, ref } from 'vue'
 import { useDentistStore } from '@/stores/modules/dentist.module'
+import { DentistDetails } from '@/pages/dentist/types' // Adjust the path according to your project structure
 
 export default defineComponent({
   name: 'GetAllDentists',
@@ -75,8 +80,9 @@ export default defineComponent({
       }
     }
 
-    const dentist = reactive({
+    const dentist = reactive<DentistDetails>({
       dentistId: '',
+      Id: '',
       clinicId: '',
       degree: '',
       institute: '',
@@ -88,7 +94,7 @@ export default defineComponent({
     const successMessage = ref('')
     const errorMessage = computed(() => dentistStore.error)
 
-    const openUpdateForm = (selectedDentist: any) => {
+    const openUpdateForm = (selectedDentist: DentistDetails) => {
       Object.assign(dentist, selectedDentist)
       showUpdateForm.value = true
     }
@@ -109,15 +115,15 @@ export default defineComponent({
       }
     }
 
-    const confirmDelete = (id: string) => {
+    const confirmDelete = (Id: string) => {
       if (confirm('Are you sure you want to delete this dentist?')) {
-        deleteDentist(id)
+        deleteDentist(Id)
       }
     }
 
-    const deleteDentist = async (id: string) => {
+    const deleteDentist = async (Id: string) => {
       try {
-        await dentistStore.deleteDentist(id)
+        await dentistStore.deleteDentist(Id)
         successMessage.value = 'Deleted Successfully'
         await fetchDentists()
         setTimeout(() => {
@@ -149,7 +155,6 @@ export default defineComponent({
 .dentist-container {
   padding: 20px;
   font-family: Arial, sans-serif;
-  margin: 0 auto;
 }
 
 .loading {
@@ -168,23 +173,12 @@ export default defineComponent({
 }
 
 .dentist-item {
-  background-color: #fff;
   border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 15px;
+  border-radius: 4px;
+  margin-bottom: 10px;
   padding: 10px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
-}
-
-.dentist-item:hover {
-  transform: translateY(-10px);
-}
-
-.dentist-item p {
-  margin: 5px 0;
 }
 
 .dentist-info {
@@ -223,8 +217,10 @@ export default defineComponent({
   background-color: #f9f9f9;
 }
 
-.update-form h2 {
+.update-form p {
   margin-bottom: 15px;
+  font-size: 24px;
+  font-weight: bold;
 }
 
 .update-form label {
@@ -233,15 +229,8 @@ export default defineComponent({
 }
 
 .update-form input {
-  /* width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px; */
-  margin-bottom: 10px;
-  padding: 12px;
-  font-size: 16px;
   width: 100%;
-  box-sizing: border-box;
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -259,8 +248,5 @@ export default defineComponent({
 
 .update-form button:hover {
   background-color: #218838;
-}
-label {
-  font-weight: bold;
 }
 </style>

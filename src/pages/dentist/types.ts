@@ -1,4 +1,5 @@
 export interface DentistDetails {
+  Id: string
   dentistId: string
   clinicId: string
   degree: string

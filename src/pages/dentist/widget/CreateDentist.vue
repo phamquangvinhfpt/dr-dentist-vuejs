@@ -32,6 +32,9 @@
         <input v-model="dentist.clinicId" placeholder="Clinic ID" required />
       </div>
       <div class="form-group">
+        <input v-model="dentist.clinicId" placeholder="Dentist ID" required />
+      </div>
+      <div class="form-group">
         <input v-model="dentist.degree" placeholder="Degree" required />
       </div>
       <div class="form-group">
@@ -65,6 +68,7 @@ export default defineComponent({
       institute: '',
       specialization: '',
       yearOfExperience: 0,
+      Id: '',
     })
 
     const successMessage = ref('')

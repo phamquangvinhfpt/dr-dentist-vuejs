@@ -66,12 +66,12 @@ export const useDentistStore = defineStore('dentistProfile', {
         this.isLoading = false
       }
     },
-    async deleteDentist(id: string): Promise<void> {
+    async deleteDentist(dentistDetailID: string): Promise<void> {
       this.isLoading = true
-      this.error = null
+      this.error = ''
       try {
-        await DentistService.deleteDentist(id)
-        this.dentists = this.dentists.filter((dentist) => dentist.dentistId !== id)
+        await DentistService.deleteDentist(dentistDetailID)
+        this.dentists = this.dentists.filter((dentist) => dentist.Id !== dentistDetailID)
       } catch (error) {
         this.error = 'Failed to delete dentist.'
         console.error('Error deleting dentist:', error)
