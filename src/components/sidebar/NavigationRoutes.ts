@@ -47,5 +47,32 @@ export default {
         },
       ],
     },
+    //appointment just have AppointmentList and AppointmentSchedule
+    {
+      name: 'appointment',
+      displayName: 'menu.appointment',
+      meta: {
+        icon: 'vuestic-iconset-calendar',
+        permission: 'Appointments.View',
+      },
+      children: [
+        {
+          name: 'appointment-list',
+          displayName: 'menu.appointment-list',
+          meta: {
+            icon: 'vuestic-iconset-calendar',
+            permission: 'Appointments.View',
+          },
+        },
+        {
+          name: 'appointment-schedule',
+          displayName: 'menu.appointment-schedule',
+          meta: {
+            icon: 'vuestic-iconset-calendar',
+            permission: 'Appointments.Create',
+          },
+        },
+      ],
+    },
   ] as INavigationRoute[],
 }
