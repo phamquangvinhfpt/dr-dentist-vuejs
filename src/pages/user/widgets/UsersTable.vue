@@ -79,6 +79,11 @@
         </VaPopover>
       </div>
     </template>
+    <template #cell(Permission)="{ row }">
+      <div class="flex items-center gap-2 ellipsis max-w-[230px]">
+        <button class="btn btn-detail" @click="viewPermission(row.rowData.id)">Detail</button>
+      </div>
+    </template>
   </VaDataTable>
   <VaCardContent>
     <div class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center p-2">
@@ -109,9 +114,11 @@ import { getErrorMessage, notifications } from '@/services/utils'
 import { useToast } from 'vuestic-ui'
 import { useEventBus, watchDebounced } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const { t } = useI18n()
 const UserStore = useUserStore()
+const router = useRouter()
 const { init: notify } = useToast()
 const totalPages = computed(() => Math.ceil(pagination.value.totalRecords / pagination.value.pageSize))
 const users = ref<UserDetail[]>([])
@@ -126,7 +133,10 @@ const pagination = ref<PagingUser>({
   currentPage: '',
   totalRecords: 5,
 })
-
+const viewPermission = (id: string) => {
+  UserStore.id = id
+  router.push({ name: 'permission-management' })
+}
 const columns = computed(() => [
   { key: 'user', label: t('user_manager.user') },
   { key: 'gender', label: t('user_manager.gender') },
@@ -134,6 +144,7 @@ const columns = computed(() => [
   { key: 'role', label: t('user_manager.role') },
   { key: 'lock', label: t('user_manager.locked') },
   { key: 'phoneNumber', label: t('user_manager.phone_number') },
+  { key: 'Permission', label: t('Permission') },
 ])
 
 const LockTypeColor = (isAccountLocked: boolean) => {
@@ -342,5 +353,16 @@ onMounted(() => {
   ::v-deep(tbody .va-data-table__table-tr) {
     border-bottom: 1px solid var(--va-background-border);
   }
+}
+.btn {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.btn-detail {
+  color: #007bff;
 }
 </style>

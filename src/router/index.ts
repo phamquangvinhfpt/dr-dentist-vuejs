@@ -82,6 +82,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/user/UsersManagement.vue'),
       },
       {
+        name: 'permission-management',
+        path: 'permission',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/permission/PermissionManagement.vue'),
+      },
+      {
         name: 'clinic-profile',
         path: 'clinic',
         meta: {
