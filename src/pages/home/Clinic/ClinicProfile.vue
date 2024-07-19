@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { clinicProfileStore } from '@modules/clinic.module'
-import { Clinic, DentalFilterResponse } from './types'
 import { onMounted, Ref, ref } from 'vue'
+import { Clinic, DentalFilterResponse } from './types'
 
 const dentalStore = clinicProfileStore()
 const dentalRecords: Ref<Clinic[]> = ref([])
