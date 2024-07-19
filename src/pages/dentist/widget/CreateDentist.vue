@@ -1,6 +1,6 @@
 <template>
   <div class="create-dentist-container">
-    <h1>Create Dentist</h1>
+    <p style="text-align: center; font-weight: bold; font-size: 24px">Create Dentist</p>
 
     <!-- Loading Indicator -->
     <div v-if="isLoading" class="loading">Creating...</div>
@@ -14,12 +14,28 @@
     <!-- Create Dentist Form -->
     <form @submit.prevent="submitForm">
       <!-- Form fields for dentist details -->
-      <input v-model="dentist.dentistId" placeholder="Dentist ID" required />
-      <input v-model="dentist.clinicId" placeholder="Clinic ID" required />
-      <input v-model="dentist.degree" placeholder="Degree" required />
-      <input v-model="dentist.institute" placeholder="Institute" required />
-      <input v-model="dentist.specialization" placeholder="Specialization" required />
-      <input v-model.number="dentist.yearOfExperience" type="number" placeholder="Years of Experience" required />
+      <div class="form-group">
+        <label for="name">Dentist Id:</label>
+        <select>
+          <option value="" disabled>Select Dentist</option>
+          <option>Id dentist</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <input v-model="dentist.clinicId" placeholder="Clinic ID" required />
+      </div>
+      <div class="form-group">
+        <input v-model="dentist.degree" placeholder="Degree" required />
+      </div>
+      <div class="form-group">
+        <input v-model="dentist.institute" placeholder="Institute" required />
+      </div>
+      <div class="form-group">
+        <input v-model="dentist.specialization" placeholder="Specialization" required />
+      </div>
+      <div class="form-group">
+        <input v-model.number="dentist.yearOfExperience" type="number" placeholder="Years of Experience" required />
+      </div>
 
       <button type="submit">Create Dentist</button>
     </form>
@@ -67,7 +83,6 @@ export default defineComponent({
         dentistStore.setError('Failed to create dentist.')
       }
     }
-
     return {
       dentist,
       isLoading: computed(() => dentistStore.isLoading),
@@ -81,6 +96,10 @@ export default defineComponent({
 
 <style scoped>
 .create-dentist-container {
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
   padding: 20px;
   font-family: Arial, sans-serif;
 }
@@ -101,14 +120,22 @@ export default defineComponent({
 }
 
 form {
+  position: relative;
   display: flex;
   flex-direction: column;
+  padding: 40px;
+  width: 100%;
+  height: auto;
 }
 
 input {
-  margin-bottom: 10px;
-  padding: 8px;
+  margin-bottom: 20px;
+  padding: 12px;
   font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 button {
@@ -119,9 +146,14 @@ button {
   padding: 8px 12px;
   cursor: pointer;
   font-size: 16px;
+  margin-bottom: 20px;
 }
 
 button:hover {
   background-color: #218838;
+}
+
+form-group {
+  margin: 20px;
 }
 </style>

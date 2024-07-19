@@ -1,6 +1,6 @@
 <template>
   <div class="dentist-container">
-    <h1>Available Dentists</h1>
+    <p style="font-weight: bold; margin-bottom: 15px; font-size: 24px; text-align: center">Available Dentists</p>
 
     <!-- Loading Indicator -->
     <div v-if="isLoading" class="loading">Loading...</div>
@@ -15,8 +15,6 @@
     <ul v-if="!isLoading && !error">
       <li v-for="dentist in dentists" :key="dentist.dentistId" class="dentist-item">
         <div class="dentist-info">
-          <p><strong>Dentist ID:</strong> {{ dentist.dentistId }}</p>
-          <p><strong>Clinic ID:</strong> {{ dentist.clinicId }}</p>
           <p><strong>Degree:</strong> {{ dentist.degree }}</p>
           <p><strong>Institute:</strong> {{ dentist.institute }}</p>
           <p><strong>Specialization:</strong> {{ dentist.specialization }}</p>
@@ -28,7 +26,7 @@
 
     <!-- Update Form -->
     <div v-if="showUpdateForm" class="update-form">
-      <h2>Update Dentist</h2>
+      <p style="font-weight: bold; margin-bottom: 15px; font-size: 24px">Update Dentist</p>
       <form @submit.prevent="submitForm">
         <label>
           Dentist ID:
@@ -151,6 +149,7 @@ export default defineComponent({
 .dentist-container {
   padding: 20px;
   font-family: Arial, sans-serif;
+  margin: 0 auto;
 }
 
 .loading {
@@ -169,12 +168,23 @@ export default defineComponent({
 }
 
 .dentist-item {
+  background-color: #fff;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
   padding: 10px;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.dentist-item:hover {
+  transform: translateY(-10px);
+}
+
+.dentist-item p {
+  margin: 5px 0;
 }
 
 .dentist-info {
@@ -223,8 +233,15 @@ export default defineComponent({
 }
 
 .update-form input {
-  width: 100%;
+  /* width: 100%;
   padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px; */
+  margin-bottom: 10px;
+  padding: 12px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -242,5 +259,8 @@ export default defineComponent({
 
 .update-form button:hover {
   background-color: #218838;
+}
+label {
+  font-weight: bold;
 }
 </style>
