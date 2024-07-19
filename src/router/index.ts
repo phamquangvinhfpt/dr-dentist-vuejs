@@ -58,6 +58,37 @@ const routes: Array<RouteRecordRaw> = [
         ],
       },
       {
+        name: 'dentist',
+        path: 'dentist',
+        meta: {
+          requiresAuth: true,
+        },
+        component: RouteViewComponent,
+        children: [
+          {
+            name: 'dentist-list',
+            path: 'all',
+            component: () => import('../pages/dentist/GetAllDentist.vue'),
+          },
+          {
+            name: 'create-dentist',
+            path: 'create',
+            component: () => import('../pages/dentist/widget/CreateDentist.vue'),
+          },
+          {
+            name: 'update-dentist',
+            path: '/update',
+            component: () => import('../pages/dentist/widget/UpdateDentist.vue'),
+          },
+          {
+            name: 'delete-dentist',
+            path: 'delete',
+            component: () => import('../pages/dentist/widget/DeleteDentist.vue'),
+            props: true, // Pass route params as props
+          },
+        ],
+      },
+      {
         name: 'notifications',
         path: 'notification',
         meta: {
@@ -82,6 +113,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/user/UsersManagement.vue'),
       },
       {
+        name: 'permission-management',
+        path: 'permission',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/permission/PermissionManagement.vue'),
+      },
+      {
         name: 'clinic-profile',
         path: 'clinic',
         meta: {
@@ -96,6 +135,26 @@ const routes: Array<RouteRecordRaw> = [
           requiresAuth: true,
         },
         component: () => import('../pages/home/clinic/ClinicDashboard.vue'),
+      },
+      {
+        name: 'appointments',
+        path: 'appointments',
+        meta: {
+          requiresAuth: true,
+        },
+        component: RouteViewComponent,
+        children: [
+          {
+            name: 'appointment-list',
+            path: 'appointment-list',
+            component: () => import('../pages/appointment/AppointmentList.vue'),
+          },
+          {
+            name: 'appointment-schedule',
+            path: 'appointment-schedule',
+            component: () => import('../pages/appointment/AppointmentSchedule.vue'),
+          },
+        ],
       },
     ],
   },

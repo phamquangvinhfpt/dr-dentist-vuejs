@@ -134,6 +134,7 @@ export const useUserProfileStore = defineStore('userProfile', {
 
 export const useUserStore = defineStore('users', {
   state: () => ({
+    id: '' as string,
     userDetails: [] as UserDetail[],
     isLoading: false as boolean,
   }),

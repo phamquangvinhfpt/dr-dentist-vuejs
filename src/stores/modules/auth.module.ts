@@ -27,6 +27,7 @@ export const Action = {
 }
 
 export const Resource = {
+  Permission: 'Permission',
   Dashboard: 'Dashboard',
   Hangfire: 'Hangfire',
   Users: 'Users',

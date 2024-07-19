@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useDentalStore } from '@stores/modules/dental.module'
 import { useRouter } from 'vue-router'
-import { onMounted, Ref, ref, reactive } from 'vue'
+import { onMounted, Ref, ref, reactive, computed, watch } from 'vue'
 import { DentalFilterResponse, Dentals } from './types'
 
 const dentalStore = useDentalStore()
@@ -9,14 +9,27 @@ const router = useRouter()
 
 const formData = reactive({
   pageNumber: 1,
-  search: '',
+  searchTerm: '',
+  pageSize: 10,
+  sortDesc: false,
+  sortBy: '',
 })
 const dentalRecordsFilter: Ref<DentalFilterResponse | null> = ref(null)
 const dentalRecords: Ref<Dentals[]> = ref([])
 
-const getAllDental = async () => {
+const getAllDentalAndSearch = async () => {
   try {
-    const res = await dentalStore.GetDentalRecords(formData.pageNumber)
+    let sortOrder = 'asc'
+    if (formData.sortDesc) {
+      sortOrder = 'desc'
+    }
+    const res = await dentalStore.GetDentalRecordAndSearch(
+      formData.pageNumber,
+      formData.pageSize,
+      formData.searchTerm,
+      sortOrder,
+      formData.sortBy,
+    )
     dentalRecordsFilter.value = res
     dentalRecords.value = dentalRecordsFilter.value.data
   } catch (error) {
@@ -24,7 +37,6 @@ const getAllDental = async () => {
     dentalRecordsFilter.value = null
   }
 }
-
 // Function to format date
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
@@ -44,62 +56,147 @@ const getAppointmentStatus = (type: number) => {
   const types = ['Scheduled', 'Completed', 'Cancelled', 'Pending']
   return types[type] || 'Unknown'
 }
-
-// Function to navigate to detail view
+const columns = computed(() => [
+  { key: 'dentist', label: 'Dentist' },
+  { key: 'createdAt', label: 'Create At' },
+  { key: 'patient', label: 'Patient' },
+  { key: 'timeSlot', label: 'Time Slot' },
+  { key: 'type', label: 'Type' },
+  { key: 'status', label: 'Status' },
+  { key: 'action', label: 'Action' },
+])
+const sortOptions = [
+  { value: 'dentist', text: 'Dentist' },
+  { value: 'createdAt', text: 'Create At' },
+  { value: 'patient', text: 'Patient' },
+  { value: 'type', text: 'Type' },
+]
 const viewDetails = (id: string) => {
   dentalStore.id = id
   router.push({ name: 'detail' })
 }
-
-// Fetch dental records on component mount
+watch(
+  () => formData.pageSize,
+  (newPageSize) => {
+    formData.pageSize = newPageSize
+    getAllDentalAndSearch()
+  },
+)
+watch(
+  () => formData.searchTerm,
+  (newSearch) => {
+    formData.searchTerm = newSearch
+    getAllDentalAndSearch()
+  },
+)
+watch(
+  () => dentalRecordsFilter.value?.pageNumber,
+  (newPage) => {
+    formData.pageNumber = newPage as number
+    getAllDentalAndSearch()
+  },
+)
+watch(
+  () => formData.sortBy,
+  (newSortBy) => {
+    console.log('sort - data', formData.sortBy)
+    formData.sortBy = newSortBy
+    getAllDentalAndSearch()
+  },
+)
+watch(
+  () => formData.sortDesc,
+  (newSortDesc) => {
+    formData.sortDesc = newSortDesc
+    getAllDentalAndSearch()
+  },
+)
 onMounted(() => {
-  getAllDental()
+  getAllDentalAndSearch()
 })
 </script>
 
 <template>
   <div class="grid sm:grid-cols-2 md:grid-cols-5 gap-6 mb-6">
-    <VaInput class="sm:col-span-2 md:col-span-3" placeholder="Search: " />
+    <VaInput v-model="formData.searchTerm" class="sm:col-span-2 md:col-span-3" placeholder="Search: " />
+    <VaSelect
+      v-model="formData.sortBy"
+      class="sm:col-span-1 md:col-span-1"
+      :options="sortOptions.map((option) => option.text)"
+      placeholder="Order By"
+    />
+    <div class="sm:col-span-1 md:col-span-1 flex items-center">
+      <label class="mr-2">Descreasing</label>
+      <input v-model="formData.sortDesc" type="checkbox" />
+    </div>
   </div>
-  <div class="va-table-responsive">
-    <table class="va-table" style="width: 100%; height: 500px">
-      <thead>
-        <tr>
-          <th>Dentist</th>
-          <th>Create At</th>
-          <th>Patient</th>
-          <th>Time Slot</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Loop through dental records and display them in table rows -->
-        <tr v-for="record in dentalRecords" :key="record.id">
-          <td>{{ record.dentist }}</td>
-          <td>{{ formatDate(record.createdAt) }}</td>
-          <td>{{ record.patient }}</td>
-          <td>{{ record.timeSlot || 'N/A' }}</td>
-          <td>{{ getAppointmentType(record.type) }}</td>
-          <td>{{ getAppointmentStatus(record.status) }}</td>
-          <td>
-            <button class="btn btn-detail" @click="viewDetails(record.id)">Detail</button>
-          </td>
-        </tr>
-        <!-- Display message if no data is available -->
-        <tr v-if="dentalRecords.length === 0">
-          <td colspan="5">No data available</td>
-        </tr>
-      </tbody>
-      <!-- Pagination component -->
-      <VaPagination
-        v-model="formData.pageNumber"
-        :pages="dentalRecordsFilter?.pageSize"
-        @update:modelValue="getAllDental"
-      />
-    </table>
-  </div>
+  <VaDataTable
+    class="my-table va-table--hoverable"
+    :items="dentalRecords"
+    :columns="columns"
+    hoverable
+    select-mode="multiple"
+    :disable-client-side-sorting="false"
+    :style="{
+      '--va-data-table-thead-background': 'var(--va-background-element)',
+      '--va-data-table-grid-tr-border': '1px solid var(--va-background-border)',
+    }"
+    sticky-header
+    no-data-html="<div class='text-center'>No data found</div>"
+  >
+    <template #cell(dentist)="{ row }">
+      <div class="flex items-center gap-2 ellipsis max-w-[230px]">
+        <span class="w-24">{{ row.rowData.dentist }}</span>
+      </div>
+    </template>
+    <template #cell(createdAt)="{ row }">
+      <div class="flex items-center gap-2 ellipsis max-w-[230px]">
+        <span class="w-24">{{ formatDate(row.rowData.createdAt) }}</span>
+      </div>
+    </template>
+    <template #cell(patient)="{ row }">
+      <div class="flex items-center gap-2 ellipsis max-w-[230px]">
+        <span class="w-24">{{ row.rowData.patient }}</span>
+      </div>
+    </template>
+    <template #cell(timeSlot)="{ row }">
+      <div class="flex items-center gap-2 ellipsis max-w-[230px]">
+        <span class="w-24">{{ row.rowData.timeSlot || 'N/A' }}</span>
+      </div>
+    </template>
+    <template #cell(type)="{ row }">
+      <div class="flex items-center gap-2 ellipsis max-w-[230px]">
+        <span class="w-24">{{ getAppointmentType(row.rowData.type) }}</span>
+      </div>
+    </template>
+    <template #cell(status)="{ row }">
+      <div class="flex items-center gap-2 ellipsis max-w-[230px]">
+        <span class="w-24">{{ getAppointmentStatus(row.rowData.status) }}</span>
+      </div>
+    </template>
+    <template #cell(action)="{ row }">
+      <button class="btn btn-detail" @click="viewDetails(row.rowData.id)">Detail</button>
+    </template>
+  </VaDataTable>
+  <VaCardContent>
+    <div v-if="dentalRecordsFilter" class="flex flex-col-reverse md:flex-row gap-2 justify-between items-center p-2">
+      <div>
+        <b>{{ dentalRecordsFilter.totalRecords }} {{ 'Result' }}.</b>
+        {{ 'Result per page' }}
+        <VaSelect v-model="formData.pageSize" class="!w-20" :options="[10, 50, 100]" />
+      </div>
+      <div v-if="dentalRecordsFilter.totalPages > 1" class="flex">
+        <VaPagination
+          v-model="dentalRecordsFilter.pageNumber"
+          buttons-preset="secondary"
+          :pages="dentalRecordsFilter.totalPages"
+          :visible-pages="5"
+          :boundary-links="true"
+          :direction-links="true"
+        />
+      </div>
+    </div>
+  </VaCardContent>
 </template>
 
 <style>

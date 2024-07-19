@@ -17,9 +17,28 @@ export const useDentalStore = defineStore('groupDental', {
     }
   },
   actions: {
-    async GetDentalRecords(pageNum: number): Promise<DentalFilterResponse> {
+    async GetDentalRecords(pageNum: number, pageSize: number): Promise<DentalFilterResponse> {
       try {
-        const res = await dentalService.GetAll(pageNum)
+        const res = await dentalService.GetAll(pageNum, pageSize)
+        this.isLoading = false
+        if (res[0] && typeof res[0] === 'object') {
+          this.dentals = res[0] as DentalFilterResponse
+        }
+        return Promise.resolve(this.dentals)
+      } catch (error) {
+        this.dentals = {} as DentalFilterResponse
+        return Promise.reject(error)
+      }
+    },
+    async GetDentalRecordAndSearch(
+      pageNum: number,
+      pageSize: number,
+      searchTerm: string,
+      sortOrder: string,
+      sortBy: string,
+    ): Promise<DentalFilterResponse> {
+      try {
+        const res = await dentalService.GetAllAndSearch(pageNum, pageSize, searchTerm, sortOrder, sortBy)
         this.isLoading = false
         if (res[0] && typeof res[0] === 'object') {
           this.dentals = res[0] as DentalFilterResponse

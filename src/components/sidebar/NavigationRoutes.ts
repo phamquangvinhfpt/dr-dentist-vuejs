@@ -55,5 +55,68 @@ export default {
         permission: 'AuditLogs.View',
       },
     },
+    {
+      name: 'appointment',
+      displayName: 'menu.appointment',
+      meta: {
+        icon: 'vuestic-iconset-calendar',
+        permission: 'Appointments.View',
+      },
+      children: [
+        {
+          name: 'appointment-list',
+          displayName: 'menu.appointment-list',
+          meta: {
+            icon: 'vuestic-iconset-calendar',
+            permission: 'Appointments.View',
+          },
+        },
+        {
+          name: 'appointment-schedule',
+          displayName: 'menu.appointment-schedule',
+          meta: {
+            icon: 'vuestic-iconset-calendar',
+            permission: 'Appointments.Create',
+          },
+        },
+      ],
+    },
+    {
+      name: 'dentist',
+      displayName: 'menu.dentist',
+      meta: {
+        icon: 'vuestic-iconset-dentist',
+      },
+      children: [
+        {
+          name: 'dentist-list',
+          displayName: 'menu.dentist-list',
+          meta: {
+            icon: 'vuestic-iconset-exam',
+          },
+        },
+        {
+          name: 'create-dentist',
+          displayName: 'menu.create-dentist',
+          meta: {
+            icon: 'vuestic-iconset-plus',
+          },
+        },
+        {
+          name: 'update-dentist',
+          displayName: 'menu.update-dentist',
+          meta: {
+            icon: 'vuestic-iconset-edit',
+          },
+        },
+        {
+          name: 'delete-dentist',
+          displayName: 'menu.delete-dentist',
+          meta: {
+            icon: 'vuestic-iconset-delete',
+          },
+        },
+      ],
+    },
   ] as INavigationRoute[],
 }
