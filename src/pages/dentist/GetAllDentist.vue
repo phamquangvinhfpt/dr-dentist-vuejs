@@ -8,6 +8,9 @@
     <!-- Error Message -->
     <div v-if="error" class="error">{{ error }}</div>
 
+    <!-- Success Message -->
+    <div v-if="successMessage" class="success">{{ successMessage }}</div>
+
     <!-- Dentists List -->
     <ul v-if="!isLoading && !error">
       <li v-for="dentist in dentists" :key="dentist.dentistId" class="dentist-item">
@@ -56,9 +59,10 @@
     </div>
   </div>
 </template>
+
 <script lang="ts">
 import { defineComponent, computed, onMounted, reactive, ref } from 'vue'
-import { useDentistStore } from '@/stores/modules/dentist.module' // Ensure the path is correct
+import { useDentistStore } from '@/stores/modules/dentist.module'
 
 export default defineComponent({
   name: 'GetAllDentists',
@@ -67,7 +71,7 @@ export default defineComponent({
 
     const fetchDentists = async () => {
       try {
-        await dentistStore.getDentists() // Call the action to fetch dentists
+        await dentistStore.getDentists()
       } catch (err) {
         dentistStore.setError('Failed to fetch dentists.')
       }
@@ -83,6 +87,8 @@ export default defineComponent({
     })
 
     const showUpdateForm = ref(false)
+    const successMessage = ref('')
+    const errorMessage = computed(() => dentistStore.error)
 
     const openUpdateForm = (selectedDentist: any) => {
       Object.assign(dentist, selectedDentist)
@@ -90,32 +96,115 @@ export default defineComponent({
     }
 
     const submitForm = async () => {
-      try {
-        console.log('data : ', dentist.dentistId)
-        await dentistStore.updateDentist(dentist)
-        showUpdateForm.value = false
-      } catch (err) {
-        dentistStore.setError('Failed to update dentist.')
+      const confirmUpdate = confirm('Are you sure you want to update this dentist?')
+      if (confirmUpdate) {
+        try {
+          await dentistStore.updateDentist(dentist)
+          successMessage.value = 'Updated Successfully'
+          showUpdateForm.value = false
+          setTimeout(() => {
+            successMessage.value = ''
+          }, 2000)
+        } catch (err) {
+          dentistStore.setError('Failed to update dentist.')
+        }
       }
     }
 
-    // Fetch data on component mount
+    const confirmDelete = (id: string) => {
+      if (confirm('Are you sure you want to delete this dentist?')) {
+        deleteDentist(id)
+      }
+    }
+
+    const deleteDentist = async (id: string) => {
+      try {
+        await dentistStore.deleteDentist(id)
+        successMessage.value = 'Deleted Successfully'
+        await fetchDentists()
+        setTimeout(() => {
+          successMessage.value = ''
+        }, 5000)
+      } catch (err) {
+        dentistStore.setError('Failed to delete dentist.')
+      }
+    }
+
     onMounted(fetchDentists)
 
     return {
       dentists: computed(() => dentistStore.dentists),
       isLoading: computed(() => dentistStore.isLoading),
-      error: computed(() => dentistStore.error),
+      error: errorMessage,
+      successMessage,
       dentist,
       showUpdateForm,
       openUpdateForm,
       submitForm,
+      confirmDelete,
     }
   },
 })
 </script>
 
 <style scoped>
+.dentist-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.loading {
+  font-size: 18px;
+  color: #007bff;
+}
+
+.error {
+  font-size: 18px;
+  color: red;
+}
+
+.success {
+  font-size: 18px;
+  color: green;
+}
+
+.dentist-item {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.dentist-info {
+  margin-bottom: 10px;
+}
+
+.schedule-btn,
+.delete-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.schedule-btn:hover {
+  background-color: #218838;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
 .update-form {
   margin-top: 20px;
   padding: 20px;
@@ -142,36 +231,6 @@ export default defineComponent({
 
 .update-form button {
   margin-top: 10px;
-}
-.dentist-container {
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
-.loading {
-  font-size: 18px;
-  color: #007bff;
-}
-
-.error {
-  font-size: 18px;
-  color: red;
-}
-
-.dentist-item {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column; /* Adjusted for better readability */
-}
-
-.dentist-info {
-  margin-bottom: 10px; /* Added margin for spacing */
-}
-
-.schedule-btn {
   background-color: #28a745;
   color: white;
   border: none;
@@ -179,10 +238,9 @@ export default defineComponent({
   padding: 8px 12px;
   cursor: pointer;
   font-size: 16px;
-  align-self: flex-start; /* Align button to the start */
 }
 
-.schedule-btn:hover {
+.update-form button:hover {
   background-color: #218838;
 }
 </style>

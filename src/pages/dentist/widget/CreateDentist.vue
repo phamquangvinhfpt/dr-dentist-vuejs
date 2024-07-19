@@ -8,6 +8,9 @@
     <!-- Error Message -->
     <div v-if="error" class="error">{{ error }}</div>
 
+    <!-- Success Message -->
+    <div v-if="successMessage" class="success">{{ successMessage }}</div>
+
     <!-- Create Dentist Form -->
     <form @submit.prevent="submitForm">
       <!-- Form fields for dentist details -->
@@ -24,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, computed } from 'vue'
+import { defineComponent, reactive, ref, computed } from 'vue'
 import { useDentistStore } from '@/stores/modules/dentist.module'
 import { DentistDetails } from '@/pages/dentist/types'
 
@@ -33,7 +36,7 @@ export default defineComponent({
   setup() {
     const dentistStore = useDentistStore()
     const dentist = reactive<DentistDetails>({
-      dentistId: '', // Add id property here
+      dentistId: '',
       clinicId: '',
       degree: '',
       institute: '',
@@ -41,9 +44,25 @@ export default defineComponent({
       yearOfExperience: 0,
     })
 
+    const successMessage = ref('')
+
     const submitForm = async () => {
       try {
         await dentistStore.createDentist(dentist)
+        successMessage.value = 'Created Successfully'
+        // Clear the form fields after successful creation if needed
+        Object.assign(dentist, {
+          dentistId: '',
+          clinicId: '',
+          degree: '',
+          institute: '',
+          specialization: '',
+          yearOfExperience: 0,
+        })
+        // Show success message for 2 seconds
+        setTimeout(() => {
+          successMessage.value = ''
+        }, 2000)
       } catch (err) {
         dentistStore.setError('Failed to create dentist.')
       }
@@ -53,6 +72,7 @@ export default defineComponent({
       dentist,
       isLoading: computed(() => dentistStore.isLoading),
       error: computed(() => dentistStore.error),
+      successMessage,
       submitForm,
     }
   },
@@ -73,6 +93,11 @@ export default defineComponent({
 .error {
   font-size: 18px;
   color: red;
+}
+
+.success {
+  font-size: 18px;
+  color: green;
 }
 
 form {

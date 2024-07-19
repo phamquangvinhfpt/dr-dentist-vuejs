@@ -7,10 +7,10 @@ class DentistService {
   async getAllDentists(): Promise<DentistDetails[]> {
     try {
       const response = await apiService.get('/Dentist')
-      console.log(response.data)
+      console.log('Fetched all dentists:', response.data)
       return response.data
     } catch (error) {
-      console.error('Error fetching all dentists:', error)
+      console.error('Error fetching all dentists:', this.formatError(error))
       throw error
     }
   }
@@ -19,13 +19,10 @@ class DentistService {
   async getDentistById(id: string): Promise<DentistDetails> {
     try {
       const response = await apiService.get(`/Dentist/${id}`)
+      console.log(`Fetched dentist with ID ${id}:`, response.data)
       return response.data
     } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error(`Error fetching dentist with ID ${id}:`, error.response?.data || error.message)
-      } else {
-        console.error(`Unexpected error fetching dentist with ID ${id}:`, error)
-      }
+      console.error(`Error fetching dentist with ID ${id}:`, this.formatError(error))
       throw error
     }
   }
@@ -34,9 +31,10 @@ class DentistService {
   async createDentist(request: DentistDetails): Promise<DentistDetails> {
     try {
       const response = await apiService.post('/Dentist', request)
+      console.log('Created new dentist:', response.data)
       return response.data
     } catch (error) {
-      console.error('Error creating dentist:', error)
+      console.error('Error creating dentist:', this.formatError(error))
       throw error
     }
   }
@@ -45,13 +43,10 @@ class DentistService {
   async updateDentist(id: string, request: DentistDetails): Promise<DentistDetails> {
     try {
       const response = await apiService.put(`/Dentist/${id}`, request)
+      console.log(`Updated dentist with ID ${id}:`, response.data)
       return response.data
     } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error(`Error updating dentist with ID ${id}:`, error.response?.data || error.message)
-      } else {
-        console.error(`Unexpected error updating dentist with ID ${id}:`, error)
-      }
+      console.error(`Error updating dentist with ID ${id}:`, this.formatError(error))
       throw error
     }
   }
@@ -60,10 +55,19 @@ class DentistService {
   async deleteDentist(id: string): Promise<void> {
     try {
       await apiService.delete(`/Dentist/${id}`)
+      console.log(`Deleted dentist with ID ${id}`)
     } catch (error) {
-      console.error(`Error deleting dentist with ID ${id}:`, error)
+      console.error(`Error deleting dentist with ID ${id}:`, this.formatError(error))
       throw error
     }
+  }
+
+  // Utility function to format error messages
+  private formatError(error: any): string {
+    if (error instanceof AxiosError) {
+      return error.response?.data?.message || error.message
+    }
+    return error.message || 'An unexpected error occurred'
   }
 }
 
