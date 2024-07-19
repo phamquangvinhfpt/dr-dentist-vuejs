@@ -47,5 +47,13 @@ export default {
         },
       ],
     },
+    {
+      name: 'audit logs',
+      displayName: 'menu.audit-logs',
+      meta: {
+        icon: 'list_alt',
+        permission: 'AuditLogs.View',
+      },
+    },
   ] as INavigationRoute[],
 }

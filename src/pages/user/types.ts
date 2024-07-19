@@ -10,6 +10,16 @@ export interface UserDetail {
   phoneNumber: string
   phoneNumberConfirmed: boolean
   imageUrl: string
+  roleType: Roles
+  isAccountLocked: boolean
+}
+
+export enum Roles {
+  SuperAdmin,
+  ClinicOwner,
+  Dentist,
+  Customer,
+  Guest,
 }
 
 export enum Gender {
@@ -93,3 +103,5 @@ export type PagingUser = {
   previousPage?: string
   nextPage?: string
 }
+
+export const USER_DELETED_EVENT = 'userDeleted'

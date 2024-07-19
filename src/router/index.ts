@@ -66,6 +66,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/notification/Notification.vue'),
       },
       {
+        name: 'audit logs',
+        path: 'audit-logs',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/audit-logs/AuditLogs.vue'),
+      },
+      {
         name: 'users-management',
         path: 'users-management',
         meta: {
@@ -79,7 +87,15 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           requiresAuth: true,
         },
-        component: () => import('../pages/home/Clinic/ClinicProfile.vue'),
+        component: () => import('../pages/home/clinic/ClinicProfile.vue'),
+      },
+      {
+        name: 'clinic-profile-management',
+        path: 'clinic-management',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/home/clinic/ClinicDashboard.vue'),
       },
     ],
   },

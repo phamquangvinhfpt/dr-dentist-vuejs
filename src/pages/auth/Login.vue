@@ -97,7 +97,7 @@ const submit = async () => {
 onBeforeMount(() => {
   if (store.isAuthenticated) {
     push({ name: 'dashboard' })
-    init({ message: 'You are already logged in', color: 'danger' })
+    init({ message: 'You are already logged in', color: 'success', position: 'bottom-right' })
   }
 })
 </script>

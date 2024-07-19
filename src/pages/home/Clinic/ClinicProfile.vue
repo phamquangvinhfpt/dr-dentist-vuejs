@@ -9,8 +9,21 @@ const dentalRecordsFilter: Ref<DentalFilterResponse | null> = ref(null)
 
 const getAllDental = async () => {
   try {
-    const res = await dentalStore.getClinicProfile()
-    dentalRecordsFilter.value = res
+    await dentalStore.getAllClinics()
+    dentalRecordsFilter.value = {
+      pageNumber: 1, // dummy value
+      pageSize: 10, // dummy value
+      firstPage: '', // dummy value
+      lastPage: '', // dummy value
+      totalPages: 1, // dummy value
+      totalRecords: dentalStore.clinics.length,
+      nextPage: null,
+      previousPage: null,
+      data: dentalStore.clinics,
+      succeeded: true,
+      errors: null,
+      message: null,
+    }
     console.log('data:', dentalRecordsFilter.value)
     dentalRecords.value = dentalRecordsFilter.value.data
     console.log('rep-data', dentalRecords.value)
@@ -19,10 +32,12 @@ const getAllDental = async () => {
     dentalRecordsFilter.value = null
   }
 }
+
 onMounted(() => {
   getAllDental()
 })
 </script>
+
 <template>
   <div class="clinic-profile">
     <div v-for="clinic in dentalRecords" :key="clinic.ownerID" class="clinic-details">
@@ -43,7 +58,7 @@ onMounted(() => {
       <h3>Clinic Details</h3>
       <ul>
         <li v-for="detail in clinic.clinicDetails" :key="detail.clinicID">
-          <strong>Time:</strong> {{ detail.openingTime }} - {{ detail.closingTime }} (Slot Duration:
+          <strong>TimeLine:</strong> {{ detail.openingTime }} - {{ detail.closingTime }} (Slot Duration:
           {{ detail.slotDuration }} mins, Max Patients per Slot: {{ detail.maxPatientsPerSlot }})
         </li>
       </ul>

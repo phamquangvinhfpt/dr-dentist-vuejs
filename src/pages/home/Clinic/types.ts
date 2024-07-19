@@ -1,5 +1,6 @@
 export interface Clinic {
   ownerID: string
+  name: string
   address: string | null
   verified: boolean
   owner: AppUser
@@ -25,6 +26,7 @@ export enum UserStatus {
 }
 export interface ClinicDetail {
   clinicID: string
+  dayOfTheWeek: string
   openingTime: string
   closingTime: string
   slotDuration: number

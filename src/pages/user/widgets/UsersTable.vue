@@ -6,7 +6,7 @@
     hoverable
     clickable
     selectable
-    select-mode="multiple"
+    select-mode="single"
     :disable-client-side-sorting="false"
     :style="{
       '--va-data-table-thead-background': 'var(--va-background-element)',
@@ -41,6 +41,37 @@
         <span class="w-24">{{ formatBirthDate(row.rowData?.birthDate) }}</span>
       </div>
     </template>
+    <template #cell(role)="{ row }">
+      <div class="flex items-center gap-2 ellipsis max-w-[150px]">
+        <VaSelect
+          :model-value="getRoleOption(row.rowData.roleType)"
+          track-by="roleType"
+          :text-by="(option: any) => option.name"
+          :options="RoleTypeOptions"
+          @update:modelValue="updateUserRole(row.rowData?.roleType, $event)"
+        >
+          <template #content="{ value }">
+            <VaBadge :text="value.name" :color="RoleTypeColor(value.roleType)" class="mr-2" />
+          </template>
+          <template #option="{ option, selectOption }">
+            <button class="w-full flex items-center" @click="() => selectOption(option)">
+              <div class="flex justify-between items-center p-2">
+                <VaBadge :text="(option as any).name" :color="RoleTypeColor((option as any).roleType)" class="mr-2" />
+              </div>
+            </button>
+          </template>
+        </VaSelect>
+      </div>
+    </template>
+    <template #cell(lock)="{ row }">
+      <div class="flex items-center gap-2 ellipsis max-w-[230px]">
+        <VaBadge
+          :text="row.rowData?.isAccountLocked ? t('user_manager.locked') : t('user_manager.unlocked')"
+          :color="LockTypeColor(row.rowData?.isAccountLocked)"
+          class="mr-2"
+        />
+      </div>
+    </template>
     <template #cell(phoneNumber)="{ value }">
       <div class="flex items-center gap-2 ellipsis max-w-[230px]">
         <VaPopover icon="info" :message="formatPhoneNumber(value)">
@@ -71,12 +102,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, PropType, ref } from 'vue'
-import { PagingUser, UserDetail } from '@/pages/user/types'
+import { computed, onMounted, onUnmounted, PropType, ref } from 'vue'
+import { PagingUser, Roles, USER_DELETED_EVENT, UserDetail } from '@/pages/user/types'
 import { useUserStore } from '@/stores/modules/user.module'
 import { getErrorMessage, notifications } from '@/services/utils'
 import { useToast } from 'vuestic-ui'
-import { watchDebounced } from '@vueuse/core'
+import { useEventBus, watchDebounced } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -100,15 +131,57 @@ const columns = computed(() => [
   { key: 'user', label: t('user_manager.user') },
   { key: 'gender', label: t('user_manager.gender') },
   { key: 'birthDate', label: t('user_manager.birth_date') },
+  { key: 'role', label: t('user_manager.role') },
+  { key: 'lock', label: t('user_manager.locked') },
   { key: 'phoneNumber', label: t('user_manager.phone_number') },
 ])
 
+const LockTypeColor = (isAccountLocked: boolean) => {
+  return isAccountLocked ? 'danger' : 'success'
+}
+
+const RoleTypeOptions = [
+  { id: 1, name: t('user_manager.clinic_owner'), roleType: 1 },
+  { id: 2, name: t('user_manager.dentist'), roleType: 2 },
+  { id: 3, name: t('user_manager.customer'), roleType: 3 },
+]
+
+const enum RoleType {
+  ClinicOwner = 1,
+  Dentist = 2,
+  Customer = 3,
+}
+
+const RoleTypeColor = (type: RoleType | undefined) => {
+  if (!type) return 'primary'
+  const colors = [
+    {
+      type: RoleType.ClinicOwner,
+      color: '#FFD43A',
+    },
+    {
+      type: RoleType.Dentist,
+      color: '#ADFF00',
+    },
+    {
+      type: RoleType.Customer,
+      color: '#262824',
+    },
+  ]
+  const color = colors.find((c) => c.type === type)?.color
+  return color || 'primary'
+}
+
+const getRoleOption = (roleType: number) => {
+  return RoleTypeOptions.find((option) => option.roleType === roleType) || RoleTypeOptions[0]
+}
+
 const selectedItemsEmitted = defineModel('selectedItemsEmitted', {
-  type: Array as PropType<UserDetail[]>,
-  default: [],
+  type: Object as PropType<UserDetail>,
+  default: () => ({}),
 })
 
-const handleSelectionChange = (selectedItems: UserDetail[]) => {
+const handleSelectionChange = (selectedItems: UserDetail) => {
   selectedItemsEmitted.value = selectedItems
 }
 
@@ -137,7 +210,6 @@ const getSrcAvatar = (row: any) => {
 }
 
 const getUsers = async (query: any) => {
-  console.log(query)
   await UserStore.getUsers(query)
     .then((res) => {
       users.value = UserStore.userDetails
@@ -159,6 +231,42 @@ const getUsers = async (query: any) => {
     })
 }
 
+const updateUserRole = async (currentRoleType: Roles, newRoleOption: { roleType: number; name: string }) => {
+  try {
+    const userToUpdate = users.value.find((user) => user.roleType === currentRoleType)
+    if (userToUpdate) {
+      await UserStore.updateUserRole(userToUpdate.id, newRoleOption.roleType)
+        .then(() => {
+          notify({
+            message: notifications.updatedSuccessfully('role'),
+            color: 'info',
+          })
+          userToUpdate.roleType = newRoleOption.roleType
+          getUsers({
+            pageNumber: pagination.value.pageNumber,
+            pageSize: pagination.value.pageSize,
+          })
+        })
+        .catch((error) => {
+          notify({
+            message: notifications.updateFailed('role') + getErrorMessage(error),
+            color: 'error',
+          })
+        })
+    } else {
+      notify({
+        message: notifications.updateFailed('user'),
+        color: 'error',
+      })
+    }
+  } catch (error) {
+    notify({
+      message: notifications.updateFailed('user') + getErrorMessage(error),
+      color: 'error',
+    })
+  }
+}
+
 watchDebounced(
   () => props.filterQueries,
   (newFilterQueries) => {
@@ -167,7 +275,6 @@ watchDebounced(
       pageSize: pagination.value.pageSize,
       ...newFilterQueries,
     }
-    console.log('newFilterQueries', newFilterQueries)
     getUsers(queries)
   },
   { debounce: 500, maxWait: 1000 },
@@ -217,6 +324,17 @@ onMounted(() => {
     ...props.filterQueries,
   }
   getUsers(queries)
+  const { on, off } = useEventBus(USER_DELETED_EVENT)
+
+  const updateUserList = () => {
+    getUsers(queries)
+  }
+
+  on(updateUserList)
+
+  onUnmounted(() => {
+    off(updateUserList)
+  })
 })
 </script>
 <style lang="scss" scoped>

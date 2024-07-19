@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/modules/auth.module'
-import { reactive, ref } from 'vue'
+import { onBeforeMount, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm, useToast } from 'vuestic-ui'
 import { getErrorMessage } from '@/services/utils'
@@ -84,6 +84,13 @@ const emailRules: ((v: string) => boolean | string)[] = [
   (v) => !!v || 'Email field is required',
   (v) => /.+@.+\..+/.test(v) || 'Email should be valid',
 ]
+
+onBeforeMount(() => {
+  if (store.isAuthenticated) {
+    push({ name: 'dashboard' })
+    init({ message: 'You are already logged in', color: 'success', position: 'bottom-right' })
+  }
+})
 </script>
 
 <template>
@@ -96,7 +103,7 @@ const emailRules: ((v: string) => boolean | string)[] = [
       </p>
       <VaInput
         v-model="formData.fullName"
-        :rules="[(v: any) => !!v || t('auth_full_name_required'), ...fullnameRules]"
+        :rules="[(v: any) => !!v || t('auth.full_name_required'), ...fullnameRules]"
         class="mb-4"
         :label="t('auth.full_name')"
       />
