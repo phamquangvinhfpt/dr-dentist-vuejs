@@ -33,7 +33,7 @@ const route = useRoute()
 const dentistStore = useDentistStore()
 
 const dentist = reactive<DentistDetails>({
-  dentistId: route.query.id as string,
+  dentistId: '',
   clinicId: '',
   degree: '',
   institute: '',
