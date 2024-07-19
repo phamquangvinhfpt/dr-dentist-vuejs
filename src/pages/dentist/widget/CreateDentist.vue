@@ -22,6 +22,13 @@
         </select>
       </div>
       <div class="form-group">
+        <label for="name">Clinic Id:</label>
+        <select>
+          <option value="" disabled>Select Clinic</option>
+          <option>Id Clinic</option>
+        </select>
+      </div>
+      <div class="form-group">
         <input v-model="dentist.clinicId" placeholder="Clinic ID" required />
       </div>
       <div class="form-group">

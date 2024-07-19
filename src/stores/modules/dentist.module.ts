@@ -71,8 +71,7 @@ export const useDentistStore = defineStore('dentistProfile', {
       this.error = null
       try {
         await DentistService.deleteDentist(id)
-        // Re-fetch the dentists to ensure the list is updated
-        await this.getDentists()
+        this.dentists = this.dentists.filter((dentist) => dentist.dentistId !== id)
       } catch (error) {
         this.error = 'Failed to delete dentist.'
         console.error('Error deleting dentist:', error)
