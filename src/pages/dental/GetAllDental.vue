@@ -99,6 +99,7 @@ watch(
 watch(
   () => formData.sortBy,
   (newSortBy) => {
+    console.log('sort - data', formData.sortBy)
     formData.sortBy = newSortBy
     getAllDentalAndSearch()
   },
@@ -121,7 +122,7 @@ onMounted(() => {
     <VaSelect
       v-model="formData.sortBy"
       class="sm:col-span-1 md:col-span-1"
-      :options="sortOptions.map((option) => option.value)"
+      :options="sortOptions.map((option) => option.text)"
       placeholder="Order By"
     />
     <div class="sm:col-span-1 md:col-span-1 flex items-center">
