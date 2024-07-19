@@ -1,26 +1,43 @@
-import { DentalFilterResponse } from './../../pages/home/Clinic/types'
+import { Clinic, DentalFilterResponse } from '@/pages/home/clinic/types'
 import ClinicService from '@services/clinic.service'
 import { defineStore } from 'pinia'
 
 export const clinicProfileStore = defineStore('clinicProfile', {
   state: () => ({
-    clinic: {} as DentalFilterResponse,
+    clinics: [] as Clinic[],
+    selectedClinic: null as Clinic | null,
     isLoading: false as boolean,
   }),
   actions: {
-    async getClinicProfile(): Promise<DentalFilterResponse> {
+    async getAllClinics(): Promise<void> {
+      this.isLoading = true
       try {
-        this.isLoading = true
-        const response = await ClinicService.getAllClinics()
-        console.log('module', response)
+        const response: DentalFilterResponse = await ClinicService.getAllClinics()
+        this.clinics = response.data
+      } finally {
         this.isLoading = false
-        this.clinic = response
-
-        return await Promise.resolve(response)
-      } catch (error) {
-        this.isLoading = false
-        return await Promise.reject(error)
       }
+    },
+    async addClinic(newClinic: Clinic): Promise<void> {
+      const response: Clinic = await ClinicService.addClinic(newClinic)
+      this.clinics.push(response)
+    },
+    async updateClinic(updatedClinic: Clinic): Promise<void> {
+      const response: Clinic = await ClinicService.updateClinic(updatedClinic)
+      const index = this.clinics.findIndex((c) => c.ownerID === updatedClinic.ownerID)
+      if (index !== -1) {
+        this.clinics[index] = response
+      }
+    },
+    async deleteClinic(clinicId: string): Promise<void> {
+      await ClinicService.deleteClinic(clinicId)
+      this.clinics = this.clinics.filter((c) => c.ownerID !== clinicId)
+    },
+    selectClinic(clinic: Clinic) {
+      this.selectedClinic = clinic
+    },
+    clearSelectedClinic() {
+      this.selectedClinic = null
     },
   },
 })
