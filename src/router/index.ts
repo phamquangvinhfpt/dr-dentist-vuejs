@@ -105,6 +105,26 @@ const routes: Array<RouteRecordRaw> = [
         },
         component: () => import('../pages/home/clinic/ClinicDashboard.vue'),
       },
+      {
+        name: 'appointments',
+        path: 'appointments',
+        meta: {
+          requiresAuth: true,
+        },
+        component: RouteViewComponent,
+        children: [
+          {
+            name: 'appointment-list',
+            path: 'appointment-list',
+            component: () => import('../pages/appointment/AppointmentList.vue'),
+          },
+          {
+            name: 'appointment-schedule',
+            path: 'appointment-schedule',
+            component: () => import('../pages/appointment/AppointmentSchedule.vue'),
+          },
+        ],
+      },
     ],
   },
 
