@@ -68,7 +68,7 @@ export default defineComponent({
       institute: '',
       specialization: '',
       yearOfExperience: 0,
-      Id: '',
+      id: '',
     })
 
     const successMessage = ref('')
