@@ -13,7 +13,7 @@
 
     <!-- Dentists List -->
     <ul v-if="!isLoading && !error">
-      <li v-for="dentist in dentists" :key="dentist.Id" class="dentist-item">
+      <li v-for="dentist in dentists" :key="dentist.id" class="dentist-item">
         <div class="dentist-info">
           <p><strong>Degree:</strong> {{ dentist.degree }}</p>
           <p><strong>Institute:</strong> {{ dentist.institute }}</p>
@@ -82,7 +82,7 @@ export default defineComponent({
 
     const dentist = reactive<DentistDetails>({
       dentistId: '',
-      Id: '',
+      id: '',
       clinicId: '',
       degree: '',
       institute: '',

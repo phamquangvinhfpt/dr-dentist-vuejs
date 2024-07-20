@@ -13,14 +13,14 @@
 
     <!-- Dentists List -->
     <ul v-if="!isLoading && !error">
-      <li v-for="dentist in dentists" :key="dentist.Id" class="dentist-item">
+      <li v-for="dentist in dentists" :key="dentist.id" class="dentist-item">
         <div class="dentist-info">
           <p><strong>Degree:</strong> {{ dentist.degree }}</p>
           <p><strong>Institute:</strong> {{ dentist.institute }}</p>
           <p><strong>Specialization:</strong> {{ dentist.specialization }}</p>
           <p><strong>Years of Experience:</strong> {{ dentist.yearOfExperience }}</p>
         </div>
-        <button class="delete-btn" @click="confirmDelete(dentist.Id)">Delete</button>
+        <button class="delete-btn" @click="confirmDelete(dentist.id)">Delete</button>
       </li>
     </ul>
 
@@ -34,7 +34,7 @@
         </label>
         <label>
           Dentist Detail ID:
-          <input v-model="dentist.Id" type="text" readonly />
+          <input v-model="dentist.id" type="text" readonly />
         </label>
         <label>
           Clinic ID:
@@ -82,7 +82,7 @@ export default defineComponent({
 
     const dentist = reactive<DentistDetails>({
       dentistId: '',
-      Id: '',
+      id: '',
       clinicId: '',
       degree: '',
       institute: '',
