@@ -20,7 +20,7 @@
           <p><strong>Specialization:</strong> {{ dentist.specialization }}</p>
           <p><strong>Years of Experience:</strong> {{ dentist.yearOfExperience }}</p>
         </div>
-        <button class="delete-btn" @click="confirmDelete(dentist.id)">Delete</button>
+        <button class="delete-btn" @click="confirmDelete(dentist.dentistId)">Delete</button>
       </li>
     </ul>
 
@@ -116,6 +116,7 @@ export default defineComponent({
     }
 
     const confirmDelete = (dentistDetailID: string) => {
+      console.log('dentist', dentistDetailID)
       if (confirm('Are you sure you want to delete this dentist?')) {
         deleteDentist(dentistDetailID)
       }

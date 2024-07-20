@@ -32,10 +32,10 @@
           Dentist ID:
           <input v-model="dentist.dentistId" type="text" readonly />
         </label>
-        <!-- <label>
+        <label>
           Dentist Detail ID:
-          <input v-model="dentist.Id" type="text" readonly />
-        </label> -->
+          <input v-model="dentist.id" type="text" readonly />
+        </label>
         <label>
           Clinic ID:
           <input v-model="dentist.clinicId" type="text" readonly />
@@ -115,15 +115,15 @@ export default defineComponent({
       }
     }
 
-    const confirmDelete = (Id: string) => {
+    const confirmDelete = (dentistDetailID: string) => {
       if (confirm('Are you sure you want to delete this dentist?')) {
-        deleteDentist(Id)
+        deleteDentist(dentistDetailID)
       }
     }
 
-    const deleteDentist = async (Id: string) => {
+    const deleteDentist = async (dentistDetailID: string) => {
       try {
-        await dentistStore.deleteDentist(Id)
+        await dentistStore.deleteDentist(dentistDetailID)
         successMessage.value = 'Deleted Successfully'
         await fetchDentists()
         setTimeout(() => {

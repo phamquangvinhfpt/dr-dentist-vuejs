@@ -51,6 +51,7 @@ class DentistService {
   }
 
   // Delete a dentist by ID
+  // Delete a dentist by ID
   async deleteDentist(dentistDetailID: string): Promise<void> {
     try {
       await apiService.delete(`/Dentist/${dentistDetailID}`)

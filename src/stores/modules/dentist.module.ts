@@ -27,7 +27,6 @@ export const useDentistStore = defineStore('dentistProfile', {
       this.error = null
       try {
         const response = await DentistService.getDentistById(id)
-        console.log('API Response:', response) // Thêm dòng này
         return response
       } catch (error) {
         this.error = 'Failed to load dentist.'
@@ -55,6 +54,7 @@ export const useDentistStore = defineStore('dentistProfile', {
       this.error = null
       try {
         await DentistService.updateDentist(dentist.dentistId, dentist)
+        // Update the dentist in the list
         const index = this.dentists.findIndex((d) => d.dentistId === dentist.dentistId)
         if (index !== -1) {
           this.dentists[index] = dentist
@@ -68,10 +68,11 @@ export const useDentistStore = defineStore('dentistProfile', {
     },
     async deleteDentist(dentistDetailID: string): Promise<void> {
       this.isLoading = true
-      this.error = ''
+      this.error = null
       try {
         await DentistService.deleteDentist(dentistDetailID)
-        this.dentists = this.dentists.filter((dentist) => dentist.Id !== dentistDetailID)
+        // Remove the deleted dentist from the state
+        this.dentists = this.dentists.filter((dentist) => dentist.id !== dentistDetailID)
       } catch (error) {
         this.error = 'Failed to delete dentist.'
         console.error('Error deleting dentist:', error)
