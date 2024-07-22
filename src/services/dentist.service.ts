@@ -69,6 +69,18 @@ class DentistService {
     }
     return error.message || 'An unexpected error occurred'
   }
+
+  // getAllDentistDetailsOfClinic
+  async getAllDentistDetailsOfClinic(clinicId: string): Promise<DentistDetails[]> {
+    try {
+      const response = await apiService.get(`/Dentist/Clinic/${clinicId}`)
+      console.log(`Fetched all dentists of clinic with ID ${clinicId}:`, response.data)
+      return response.data
+    } catch (error) {
+      console.error(`Error fetching all dentists of clinic with ID ${clinicId}:`, this.formatError(error))
+      throw error
+    }
+  }
 }
 
 export default new DentistService()

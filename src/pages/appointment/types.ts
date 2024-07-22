@@ -86,6 +86,6 @@ export interface AppointmentRequest {
   timeSlot: string
   type: AppointmentType
   duration: number
-  status: AppointmentStatus
+  status?: AppointmentStatus
   date: string
 }

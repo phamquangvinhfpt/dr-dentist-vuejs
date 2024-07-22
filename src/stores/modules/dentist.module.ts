@@ -5,6 +5,7 @@ import { defineStore } from 'pinia'
 export const useDentistStore = defineStore('dentistProfile', {
   state: () => ({
     dentists: [] as DentistDetails[],
+    dentistDetails: [] as DentistDetails[],
     isLoading: false as boolean,
     error: null as string | null,
   }),
@@ -82,6 +83,19 @@ export const useDentistStore = defineStore('dentistProfile', {
     },
     setError(message: string) {
       this.error = message
+    },
+    async getAllDentistDetailsOfClinic(clinicId: string): Promise<void> {
+      this.isLoading = true
+      this.error = null
+      try {
+        const response = await DentistService.getAllDentistDetailsOfClinic(clinicId)
+        this.dentistDetails = response
+      } catch (error) {
+        this.error = 'Failed to fetch dentists.'
+        console.error('Error fetching dentists:', error)
+      } finally {
+        this.isLoading = false
+      }
     },
   },
 })

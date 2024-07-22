@@ -5,4 +5,5 @@ export interface DentistDetails {
   institute: string
   specialization: string
   yearOfExperience: number
+  dentistName?: string
 }
