@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-
 import AuthLayout from '../layouts/AuthLayout.vue'
 import AppLayout from '../layouts/AppLayout.vue'
-
 import RouteViewComponent from '../layouts/RouterBypass.vue'
 
 const routes: Array<RouteRecordRaw> = [
@@ -63,30 +61,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           requiresAuth: true,
         },
-        component: RouteViewComponent,
-        children: [
-          {
-            name: 'dentist-list',
-            path: 'all',
-            component: () => import('../pages/dentist/GetAllDentist.vue'),
-          },
-          {
-            name: 'create-dentist',
-            path: 'create',
-            component: () => import('../pages/dentist/widget/CreateDentist.vue'),
-          },
-          {
-            name: 'update-dentist',
-            path: '/update',
-            component: () => import('../pages/dentist/widget/UpdateDentist.vue'),
-          },
-          {
-            name: 'delete-dentist',
-            path: 'delete',
-            component: () => import('../pages/dentist/widget/DeleteDentist.vue'),
-            props: true, // Pass route params as props
-          },
-        ],
+        component: () => import('../pages/dentist/Dentist.vue'),
       },
       {
         name: 'notifications',

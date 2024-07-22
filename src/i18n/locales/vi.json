@@ -112,8 +112,12 @@
     "language_description": "Thay đổi ngôn ngữ của trang web.",
     "theme": "Chủ đề",
     "theme_description": "Thay đổi chủ đề của trang web.",
+    "delete": "Xóa",
+    "create": "Tạo",
+    "add": "Thêm",
+    "edit": "Chỉnh sửa",
     "save": "Lưu",
-    "cancel": "Hủy",
+    "cancel": "Hủy bỏ",
     "success": "Thành công",
     "settings_updated_successfully": "Cài đặt được cập nhật thành công",
     "general": "Chung"
