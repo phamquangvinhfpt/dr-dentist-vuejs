@@ -22,6 +22,14 @@ export default {
       },
     },
     {
+      name: 'clinic-profile-management',
+      displayName: 'menu.clinic',
+      meta: {
+        icon: 'home_health',
+        permission: 'Clinics.View',
+      },
+    },
+    {
       name: 'users-management',
       displayName: 'menu.usersManagement',
       meta: {
@@ -81,6 +89,7 @@ export default {
         },
       ],
     },
+
     {
       name: 'dentist',
       displayName: 'menu.dentist',

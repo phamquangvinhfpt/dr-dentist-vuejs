@@ -30,6 +30,19 @@ export const useUserProfileStore = defineStore('userProfile', {
         return await Promise.reject(error)
       }
     },
+    async getUserById(userId: string): Promise<any> {
+      try {
+        this.isLoading = true
+        const response = await userService.getUserById(userId)
+        this.isLoading = false
+        this.userDetails = { ...response.data }
+        console.log('check', response.data)
+        return await Promise.resolve(response.data)
+      } catch (error) {
+        this.isLoading = false
+        return await Promise.reject(error)
+      }
+    },
     async updateProfile(data: UserDetailsUpdate): Promise<any> {
       try {
         this.isLoading = true

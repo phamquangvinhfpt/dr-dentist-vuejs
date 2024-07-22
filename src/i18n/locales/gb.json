@@ -212,7 +212,8 @@
     "usersManagement": "Users Management",
     "record-list": "Record List",
     "record": "Record",
-    "audit-logs": "Audit logs"
+    "audit-logs": "Audit logs",
+    "clinic" : "Clinic"
   },
   "messages": {
     "all": "See all messages",
