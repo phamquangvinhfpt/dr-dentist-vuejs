@@ -15,7 +15,7 @@ class ClinicService {
     return apiService.put(`/Clinics/UpdateClinics/${clinicID}`, updatedClinic).then((response) => response.data)
   }
 
-  async deleteClinic(clinicId: string): Promise<void> {
+  async deleteClinic(clinicId: string): Promise<any> {
     return apiService.delete(`/Clinics/DeleteClinics/${clinicId}`).then(() => undefined)
   }
 }

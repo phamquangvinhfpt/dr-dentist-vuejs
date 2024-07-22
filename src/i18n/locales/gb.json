@@ -107,11 +107,15 @@
   "settings": {
     "title": "Settings",
     "language": "Language",
-    "dark_mode": "Dark mode",
-    "dark_mode_description": "Change the appearance of the site to a dark theme.",
-    "language_description": "Change the language of the site.",
+    "dark_mode": "Dark Mode",
+    "dark_mode_description": "Change the appearance of the website to a dark theme.",
+    "language_description": "Change the language of the website.",
     "theme": "Theme",
-    "theme_description": "Change the theme of the site.",
+    "theme_description": "Change the theme of the website.",
+    "delete": "Delete",
+    "create": "Create",
+    "add": "Add",
+    "edit": "Edit",
     "save": "Save",
     "cancel": "Cancel",
     "success": "Success",
@@ -213,7 +217,8 @@
     "record-list": "Record List",
     "record": "Record",
     "audit-logs": "Audit logs",
-    "clinic" : "Clinic"
+    "dentist": "Dentist",
+    "clinic": "Clinic"
   },
   "messages": {
     "all": "See all messages",
@@ -272,6 +277,28 @@
     "clinic_owner": "Clinic Owner",
     "dentist": "Dentist",
     "customer": "Customer"
+  },
+  "dentists": {
+    "dentist": "Dentist",
+    "degree": "Degree",
+    "institute": "Institute",
+    "specialization": "Specialization",
+    "yearOfExperience": "Year of Experience",
+    "enter_dentist": "Enter Dentist",
+    "enter_degree": "Enter Degree",
+    "enter_institute": "Enter Institute",
+    "enter_specialization": "Enter Specialization",
+    "enter_yearOfExperience": "Enter Year of Experience",
+    "edit_dentist": "Edit Dentist",
+    "delete_dentist": "Delete Dentist",
+    "search_dentist_name": "Search Dentist Name",
+    "user": "User",
+    "select_user": "Select User"
+  },
+  "clinics": {
+    "clinic": "Clinic",
+    "enter_clinic": "Enter Clinic",
+    "select_clinic": "Select Clinic"
   },
   "treeView": {
     "basic": "Basic",

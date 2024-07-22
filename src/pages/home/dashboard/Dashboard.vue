@@ -15,6 +15,7 @@ import { PaginationType } from '@/pages/audit-logs/types'
 
 const authStore = useAuthStore()
 const isAdmin = computed(() => authStore?.musHaveRole('SuperAdmin'))
+const isCustomer = computed(() => authStore?.musHaveRole('Customer'))
 
 const dentalStore = clinicProfileStore()
 const dentistStore = useDentistStore()
@@ -243,63 +244,65 @@ onMounted(() => {
 <template>
   <div class="md:mx-28">
     <Admin v-if="isAdmin" />
-    <div class="min-h-[80vh]">
-      <div class="flex flex-wrap">
-        <div v-for="clinic in dentalRecordsPagination" :key="clinic.ownerID" class="w-full md:w-1/4 px-4 mb-4">
-          <VaCard class="bg-white rounded-lg shadow-md p-6 flex">
-            <div class="flex flex-col" style="width: 100%">
-              <div class="flex">
-                <div class="flex-1 min-h-[250px]">
-                  <h3 class="text-lg font-semibold">{{ clinic.name }}</h3>
-                  <p class="text-gray-600">{{ clinic.address || 'No address provided' }}</p>
-                  <p class="text-gray-600">Owner: {{ userNames[clinic.ownerID] || 'Unknown' }}</p>
-                  <p class="text-gray-600">Verified: {{ clinic.verified ? 'Yes' : 'No' }}</p>
-                  <p class="text-gray-600">Created At: {{ new Date(clinic.createdAt).toLocaleDateString() }}</p>
-                  <p class="text-gray-600">Updated At: {{ new Date(clinic.updatedAt).toLocaleDateString() }}</p>
-                  <div>
-                    <h4 class="font-medium mt-2">Details:</h4>
-                    <ul>
-                      <li v-for="detail in clinic.clinicDetails" :key="detail.clinicID">
-                        <p>{{ detail.dayOfTheWeek }}: {{ detail.openingTime }} - {{ detail.closingTime }}</p>
-                        <p>Slot Duration: {{ detail.slotDuration }} minutes</p>
-                        <p>Max Patients per Slot: {{ detail.maxPatientsPerSlot }}</p>
-                      </li>
-                    </ul>
+    <div v-if="isCustomer">
+      <div class="min-h-[80vh]">
+        <div class="flex flex-wrap">
+          <div v-for="clinic in dentalRecordsPagination" :key="clinic.ownerID" class="w-full md:w-1/4 px-4 mb-4">
+            <VaCard class="bg-white rounded-lg shadow-md p-6 flex">
+              <div class="flex flex-col" style="width: 100%">
+                <div class="flex">
+                  <div class="flex-1 min-h-[250px]">
+                    <h3 class="text-lg font-semibold">{{ clinic.name }}</h3>
+                    <p class="text-gray-600">{{ clinic.address || 'No address provided' }}</p>
+                    <p class="text-gray-600">Owner: {{ userNames[clinic.ownerID] || 'Unknown' }}</p>
+                    <p class="text-gray-600">Verified: {{ clinic.verified ? 'Yes' : 'No' }}</p>
+                    <p class="text-gray-600">Created At: {{ new Date(clinic.createdAt).toLocaleDateString() }}</p>
+                    <p class="text-gray-600">Updated At: {{ new Date(clinic.updatedAt).toLocaleDateString() }}</p>
+                    <div>
+                      <h4 class="font-medium mt-2">Details:</h4>
+                      <ul>
+                        <li v-for="detail in clinic.clinicDetails" :key="detail.clinicID">
+                          <p>{{ detail.dayOfTheWeek }}: {{ detail.openingTime }} - {{ detail.closingTime }}</p>
+                          <p>Slot Duration: {{ detail.slotDuration }} minutes</p>
+                          <p>Max Patients per Slot: {{ detail.maxPatientsPerSlot }}</p>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <img
+                      :src="'https://cdn.iconscout.com/icon/premium/png-256-thumb/clinic-2054876-1730482.png'"
+                      alt="Owner Image"
+                      class="w-24 h-24 rounded-full object-cover"
+                    />
                   </div>
                 </div>
-                <div class="ml-4">
-                  <img
-                    :src="'https://cdn.iconscout.com/icon/premium/png-256-thumb/clinic-2054876-1730482.png'"
-                    alt="Owner Image"
-                    class="w-24 h-24 rounded-full object-cover"
-                  />
+                <div>
+                  <VaCardActions align="center">
+                    <VaButton @click="handleEditClinic(clinic)">Booking</VaButton>
+                  </VaCardActions>
                 </div>
               </div>
-              <div>
-                <VaCardActions align="center">
-                  <VaButton @click="handleEditClinic(clinic)">Booking</VaButton>
-                </VaCardActions>
-              </div>
-            </div>
-          </VaCard>
+            </VaCard>
+          </div>
         </div>
       </div>
-    </div>
-    <div v-if="pagination.totalPages > 1" class="mt-4">
-      <VaCard class="p-5">
-        <VaPagination
-          v-model="page"
-          :total="pagination.totalCount"
-          :page-size="pagination.pageSize"
-          :visible-pages="6"
-          buttons-preset="secondary"
-          border-color="primary"
-          gapped
-          rounded
-          class="justify-center sm:justify-center"
-          @update:modelValue="handlePageChange"
-        />
-      </VaCard>
+      <div v-if="pagination.totalPages > 1" class="mt-4">
+        <VaCard class="p-5">
+          <VaPagination
+            v-model="page"
+            :total="pagination.totalCount"
+            :page-size="pagination.pageSize"
+            :visible-pages="6"
+            buttons-preset="secondary"
+            border-color="primary"
+            gapped
+            rounded
+            class="justify-center sm:justify-center"
+            @update:modelValue="handlePageChange"
+          />
+        </VaCard>
+      </div>
     </div>
   </div>
 
