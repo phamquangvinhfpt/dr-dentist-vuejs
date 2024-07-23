@@ -1,4 +1,5 @@
 export interface Clinic {
+  id: string
   ownerID: string
   name: string
   address: string | null

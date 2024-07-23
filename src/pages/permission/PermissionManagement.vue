@@ -127,56 +127,58 @@ watch(
 
 <template>
   <div>
-    <VaDataTable
-      class="my-table va-table--hoverable"
-      :items="permissions"
-      :columns="columns"
-      hoverable
-      :disable-client-side-sorting="false"
-      :style="{
-        '--va-data-table-thead-background': 'var(--va-background-element)',
-        '--va-data-table-grid-tr-border': '1px solid var(--va-background-border)',
-      }"
-      sticky-header
-      no-data-html="<div class='text-center'>No data found</div>"
-    >
-      <template #cell(name)="{ value }">
-        <strong>{{ value }}</strong>
-      </template>
-      <template #cell(user)="{ row, column }">
-        <VaSelect
-          v-model="row.rowData[column.key]"
-          :options="booleanOptions.map((option) => option.label)"
-          label-by="label"
-          value-by="value"
-          @c="onChange(column.key, row.rowData['name'])"
-        />
-      </template>
-      <template #cell(dentalRecord)="{ row, column }">
-        <VaSelect
-          v-model="row.rowData[column.key]"
-          :options="booleanOptions.map((option) => option.label)"
-          label-by="label"
-          value-by="value"
-          @change="onChange(column.key, row.rowData['name'])"
-        />
-      </template>
-      <template #cell(clinic)="{ row, column }">
-        <VaSelect
-          v-model="row.rowData[column.key]"
-          :options="booleanOptions.map((option) => option.label)"
-          @change="onChange(column.key, row.rowData['name'])"
-        />
-      </template>
-      <template #cell(appointment)="{ row, column }">
-        <VaSelect
-          v-model="row.rowData[column.key]"
-          :options="booleanOptions.map((option) => option.label)"
-          label-by="label"
-          value-by="value"
-          @change="onChange(column.key, row.rowData['name'])"
-        />
-      </template>
-    </VaDataTable>
+    <VaCard>
+      <VaDataTable
+        class="my-table va-table--hoverable"
+        :items="permissions"
+        :columns="columns"
+        hoverable
+        :disable-client-side-sorting="false"
+        :style="{
+          '--va-data-table-thead-background': 'var(--va-background-element)',
+          '--va-data-table-grid-tr-border': '1px solid var(--va-background-border)',
+        }"
+        sticky-header
+        no-data-html="<div class='text-center'>No data found</div>"
+      >
+        <template #cell(name)="{ value }">
+          <strong>{{ value }}</strong>
+        </template>
+        <template #cell(user)="{ row, column }">
+          <VaSelect
+            v-model="row.rowData[column.key]"
+            :options="booleanOptions.map((option) => option.label)"
+            label-by="label"
+            value-by="value"
+            @c="onChange(column.key, row.rowData['name'])"
+          />
+        </template>
+        <template #cell(dentalRecord)="{ row, column }">
+          <VaSelect
+            v-model="row.rowData[column.key]"
+            :options="booleanOptions.map((option) => option.label)"
+            label-by="label"
+            value-by="value"
+            @change="onChange(column.key, row.rowData['name'])"
+          />
+        </template>
+        <template #cell(clinic)="{ row, column }">
+          <VaSelect
+            v-model="row.rowData[column.key]"
+            :options="booleanOptions.map((option) => option.label)"
+            @change="onChange(column.key, row.rowData['name'])"
+          />
+        </template>
+        <template #cell(appointment)="{ row, column }">
+          <VaSelect
+            v-model="row.rowData[column.key]"
+            :options="booleanOptions.map((option) => option.label)"
+            label-by="label"
+            value-by="value"
+            @change="onChange(column.key, row.rowData['name'])"
+          />
+        </template>
+      </VaDataTable>
+    </VaCard>
   </div>
 </template>

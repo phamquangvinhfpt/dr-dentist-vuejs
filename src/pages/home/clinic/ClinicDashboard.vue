@@ -2,12 +2,15 @@
 import { clinicProfileStore } from '@modules/clinic.module'
 import { Clinic, DentalFilterResponse } from './types'
 import { onMounted, Ref, ref } from 'vue'
+import { useUserProfileStore } from '@/stores/modules/user.module'
 
 const dentalStore = clinicProfileStore()
 const dentalRecords: Ref<Clinic[]> = ref([])
 const dentalRecordsFilter: Ref<DentalFilterResponse | null> = ref(null)
 const selectedClinic: Ref<Clinic | null> = ref(null)
+const userProfileStore = useUserProfileStore()
 
+const userNames: Ref<{ [key: string]: string }> = ref({})
 const getAllDental = async () => {
   try {
     await dentalStore.getAllClinics()
@@ -26,9 +29,23 @@ const getAllDental = async () => {
       message: null,
     }
     dentalRecords.value = dentalRecordsFilter.value.data
+    fetchUserNames()
   } catch (error) {
     console.error('Error fetching dental records:', error)
     dentalRecordsFilter.value = null
+  }
+}
+const fetchUserNames = async () => {
+  for (const clinic of dentalRecords.value) {
+    if (clinic.ownerID && !userNames.value[clinic.ownerID]) {
+      try {
+        await userProfileStore.getUserById(clinic.ownerID)
+        userNames.value[clinic.ownerID] = userProfileStore?.userDetails?.fullName || 'Unknown'
+      } catch (error) {
+        console.error('Error fetching user details:', error)
+        userNames.value[clinic.ownerID] = 'Unknown'
+      }
+    }
   }
 }
 
@@ -47,6 +64,7 @@ const saveClinic = async () => {
     if (selectedClinic.value?.ownerID) {
       // Ensure the clinic object contains all required fields
       const updatedClinic: Clinic = {
+        id: selectedClinic.value.id || '', // Ensure the ID is included
         ownerID: selectedClinic.value.ownerID || '',
         name: selectedClinic.value.name || '',
         address: selectedClinic.value.address || '',
@@ -60,6 +78,7 @@ const saveClinic = async () => {
     } else {
       // Ensure the clinic object contains all required fields for a new clinic
       const newClinic: Clinic = {
+        id: '', // Empty or auto-generated ID for new clinic
         ownerID: '', // Empty or auto-generated ID for new clinic
         name: selectedClinic.value?.name || '',
         address: selectedClinic.value?.address || '',
@@ -89,6 +108,7 @@ const deleteClinic = async (clinicId: string) => {
 
 const addNewClinic = () => {
   selectedClinic.value = {
+    id: '', // Empty or auto-generated ID for new clinic
     ownerID: '',
     name: '',
     address: '',
@@ -117,6 +137,7 @@ onMounted(() => {
 
     <div v-for="clinic in dentalRecords" :key="clinic.ownerID" class="clinic-details">
       <p><strong>Address:</strong> {{ clinic.address }}</p>
+      <p><strong>Owner:</strong> {{ userNames[clinic.ownerID] }}</p>
       <p><strong>Verified:</strong> {{ clinic.verified ? 'Yes' : 'No' }}</p>
       <p><strong>Name:</strong> {{ clinic.name }}</p>
 
@@ -133,6 +154,10 @@ onMounted(() => {
 
     <div v-if="selectedClinic" class="add-detail-form">
       <h3>{{ selectedClinic.ownerID ? 'Edit Clinic' : 'Add Clinic' }}</h3>
+      <label>
+        Owner:
+        <input v-model="userNames[selectedClinic.ownerID]" type="text" />
+      </label>
       <label>
         Address:
         <input v-model="selectedClinic.address" type="text" />

@@ -164,7 +164,16 @@ class UserService {
         return Promise.reject(error)
       })
   }
-
+  async getUserById(userId: string): Promise<any> {
+    return apiService
+      .get(`/users/get-user-account-byID?userId=${userId}`)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
   async unlockUserAccount(userId: string): Promise<any> {
     return apiService
       .put(`/unlock-user-account?userId=${userId}`, {})

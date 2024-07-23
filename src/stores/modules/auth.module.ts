@@ -80,9 +80,9 @@ export const useAuthStore = defineStore('auth', {
       return authService
         .login(email, password, captchaToken)
         .then((response) => {
-          if (response.data.token) {
+          if (response.data.message.token.accessToken) {
             this.isAuthenticated = true
-            const userParse = jwtService.parseToken(response.data.token)
+            const userParse = jwtService.parseToken(response.data.message.token.accessToken)
             this.user = {
               id: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
               fullName: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname'],
@@ -90,6 +90,7 @@ export const useAuthStore = defineStore('auth', {
               emailaddress: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
               phone: userParse['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/mobilephone'],
               roles: userParse['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
+              permission: userParse.permission,
             }
           } else {
             this.isAuthenticated = false
