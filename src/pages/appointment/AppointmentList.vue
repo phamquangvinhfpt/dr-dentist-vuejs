@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAppointmentStore } from '@stores/modules/appointment.module'
-import { Appointment } from './types'
+import { Appointment, AppointmentRequest } from './types'
 
 const appointmentStore = useAppointmentStore()
 const appointments = computed<Appointment[]>(() => appointmentStore.appointments)
@@ -10,9 +10,35 @@ const fetchAppointments = async () => {
   await appointmentStore.fetchAllAppointments()
 }
 
-const viewDetails = (id: string) => {
-  // Logic for viewing details of an appointment
-  console.log(`Viewing details for appointment ID: ${id}`)
+const showPopup = ref(false)
+const selectedAppointment = ref<Appointment | null>(null)
+
+const openPopup = (appointment: Appointment) => {
+  selectedAppointment.value = appointment
+  showPopup.value = true
+}
+
+const closePopup = () => {
+  showPopup.value = false
+  selectedAppointment.value = null
+}
+
+const updateAppointment = async () => {
+  if (selectedAppointment.value) {
+    const appointmentRequest: AppointmentRequest = {
+      patientID: selectedAppointment.value.patient.id, // Sửa lại thành patientID
+      dentistID: selectedAppointment.value.dentist.id, // Sửa lại thành dentistID
+      clinicID: selectedAppointment.value.clinicID,
+      date: selectedAppointment.value.date,
+      timeSlot: selectedAppointment.value.timeSlot,
+      duration: selectedAppointment.value.duration, // Thêm duration
+      type: selectedAppointment.value.type,
+      status: selectedAppointment.value.status,
+    }
+    await appointmentStore.updateAppointment(selectedAppointment.value.id, appointmentRequest)
+    fetchAppointments()
+    closePopup()
+  }
 }
 
 onMounted(() => {
@@ -46,7 +72,7 @@ onMounted(() => {
             <td>{{ appointment.type }}</td>
             <td>{{ appointment.status }}</td>
             <td>
-              <button class="btn btn-detail" @click="viewDetails(appointment.id)">Details</button>
+              <button class="btn" @click="openPopup(appointment)">Update</button>
             </td>
           </tr>
           <tr v-if="appointments.length === 0">
@@ -54,6 +80,42 @@ onMounted(() => {
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div v-if="showPopup && selectedAppointment" class="popup">
+      <div class="popup-content">
+        <h2>Update Appointment</h2>
+        <label>
+          Patient:
+          <input v-model="selectedAppointment.patient.fullName" />
+        </label>
+        <label>
+          Dentist:
+          <input v-model="selectedAppointment.dentist.fullName" />
+        </label>
+        <label>
+          Date:
+          <input v-model="selectedAppointment.date" type="date" />
+        </label>
+        <label>
+          Time Slot:
+          <input v-model="selectedAppointment.timeSlot" />
+        </label>
+        <label>
+          Duration:
+          <input v-model="selectedAppointment.duration" />
+        </label>
+        <label>
+          Type:
+          <input v-model="selectedAppointment.type" />
+        </label>
+        <label>
+          Status:
+          <input v-model="selectedAppointment.status" />
+        </label>
+        <button @click="updateAppointment">Save</button>
+        <button @click="closePopup">Cancel</button>
+      </div>
     </div>
   </div>
 </template>
@@ -89,5 +151,25 @@ onMounted(() => {
 
 .va-table th {
   background-color: #000000;
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
 }
 </style>

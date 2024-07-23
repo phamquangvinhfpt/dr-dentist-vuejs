@@ -188,7 +188,11 @@
     "projects": "Projects",
     "usersManagement": "Users Management",
     "record-list": "Record List",
-    "record": "Record"
+    "record": "Record",
+    "appointment": "Appointment",
+    "appointment-list": "Appointment List",
+    "appointment-schedule": "Appointment Schedule"
+
   },
   "messages": {
     "all": "See all messages",
