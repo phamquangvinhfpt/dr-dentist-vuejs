@@ -1,5 +1,6 @@
 import { Dentist } from '@/pages/dentist/types'
 import apiService from '@services/api.service'
+import { AxiosError } from 'axios'
 
 class DentistService {
   async getAllDentists(): Promise<Dentist[]> {
@@ -53,8 +54,15 @@ class DentistService {
       })
   }
 
+  private formatError(error: any): string {
+    if (error instanceof AxiosError) {
+      return error.response?.data?.message || error.message
+    }
+    return error.message || 'An unexpected error occurred'
+  }
+
   // getAllDentistDetailsOfClinic
-  async getAllDentistDetailsOfClinic(clinicId: string): Promise<DentistDetails[]> {
+  async getAllDentistDetailsOfClinic(clinicId: string): Promise<Dentist[]> {
     try {
       const response = await apiService.get(`/Dentist/Clinic/${clinicId}`)
       console.log(`Fetched all dentists of clinic with ID ${clinicId}:`, response.data)
