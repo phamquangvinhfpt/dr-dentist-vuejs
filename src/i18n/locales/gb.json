@@ -218,7 +218,10 @@
     "record": "Record",
     "audit-logs": "Audit logs",
     "dentist": "Dentist",
-    "clinic": "Clinic"
+    "clinic": "Clinic",
+    "appointment": "Appointment",
+    "appointment-list": "Appointment List",
+    "appointment-schedule": "Appointment Schedule"
   },
   "messages": {
     "all": "See all messages",

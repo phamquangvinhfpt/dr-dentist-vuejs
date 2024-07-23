@@ -226,7 +226,10 @@
     "record-list": "Danh Sách Hồ Sơ Khám",
     "record": "Hồ sơ khám",
     "audit-logs": "Nhật ký",
-    "clinic": "Phòng khám"
+    "clinic": "Phòng khám",
+    "appointment": "Lịch hẹn",
+    "appointment-list": "Danh sách lịch hẹn",
+    "appointment-schedule": "Đặt Lịch "
   },
   "messages": {
     "all": "Xem tất cả tin nhắn",
