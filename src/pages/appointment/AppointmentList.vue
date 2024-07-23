@@ -49,11 +49,11 @@ onMounted(() => {
 <template>
   <div class="appointment-list">
     <h1>Appointment List</h1>
-    <div class="grid sm:grid-cols-2 md:grid-cols-5 gap-6 mb-6">
-      <VaInput class="sm:col-span-2 md:col-span-3" placeholder="Search: " />
+    <div class="search-container">
+      <input type="text" class="search-input" placeholder="Search..." />
     </div>
-    <div class="va-table-responsive">
-      <table class="va-table">
+    <div class="table-container">
+      <table class="appointment-table">
         <thead>
           <tr>
             <th>Patient</th>
@@ -70,13 +70,17 @@ onMounted(() => {
             <td>{{ appointment.dentist.fullName }}</td>
             <td>{{ appointment.date }}</td>
             <td>{{ appointment.type }}</td>
-            <td>{{ appointment.status }}</td>
             <td>
-              <button class="btn" @click="openPopup(appointment)">Update</button>
+              <span :class="['status', appointment.status]">
+                {{ appointment.status }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-update" @click="openPopup(appointment)">Update</button>
             </td>
           </tr>
           <tr v-if="appointments.length === 0">
-            <td colspan="6">No appointments available</td>
+            <td colspan="6" class="no-data">No appointments available</td>
           </tr>
         </tbody>
       </table>
@@ -85,91 +89,238 @@ onMounted(() => {
     <div v-if="showPopup && selectedAppointment" class="popup">
       <div class="popup-content">
         <h2>Update Appointment</h2>
-        <label>
-          Patient:
-          <input v-model="selectedAppointment.patient.fullName" />
-        </label>
-        <label>
-          Dentist:
-          <input v-model="selectedAppointment.dentist.fullName" />
-        </label>
-        <label>
-          Date:
-          <input v-model="selectedAppointment.date" type="date" />
-        </label>
-        <label>
-          Time Slot:
-          <input v-model="selectedAppointment.timeSlot" />
-        </label>
-        <label>
-          Duration:
-          <input v-model="selectedAppointment.duration" />
-        </label>
-        <label>
-          Type:
-          <input v-model="selectedAppointment.type" />
-        </label>
-        <label>
-          Status:
-          <input v-model="selectedAppointment.status" />
-        </label>
-        <button @click="updateAppointment">Save</button>
-        <button @click="closePopup">Cancel</button>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="patient">Patient:</label>
+            <input id="patient" v-model="selectedAppointment.patient.fullName" />
+          </div>
+          <div class="form-group">
+            <label for="dentist">Dentist:</label>
+            <input id="dentist" v-model="selectedAppointment.dentist.fullName" />
+          </div>
+          <div class="form-group">
+            <label for="date">Date:</label>
+            <input id="date" v-model="selectedAppointment.date" type="date" />
+          </div>
+          <div class="form-group">
+            <label for="timeSlot">Time Slot:</label>
+            <input id="timeSlot" v-model="selectedAppointment.timeSlot" />
+          </div>
+          <div class="form-group">
+            <label for="duration">Duration:</label>
+            <input id="duration" v-model="selectedAppointment.duration" />
+          </div>
+          <div class="form-group">
+            <label for="type">Type:</label>
+            <input id="type" v-model="selectedAppointment.type" />
+          </div>
+          <div class="form-group">
+            <label for="status">Status:</label>
+            <input id="status" v-model="selectedAppointment.status" />
+          </div>
+        </div>
+        <div class="button-group">
+          <button class="btn btn-save" @click="updateAppointment">Save</button>
+          <button class="btn btn-cancel" @click="closePopup">Cancel</button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.btn {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
+.appointment-list {
+  width: 100%;
+  max-width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+h1 {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.search-container {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  background-color: #fff;
-  cursor: pointer;
+  font-size: 16px;
+  box-sizing: border-box;
 }
 
-.btn-detail {
-  color: #007bff;
+.table-container {
+  width: 100%;
+  overflow-x: auto;
 }
 
-.va-table-responsive {
-  overflow: auto;
-}
-
-.va-table {
+.appointment-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.va-table th,
-.va-table td {
+.appointment-table th,
+.appointment-table td {
   padding: 12px;
-  border: 1px solid #000000;
-  color: #ffffff;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
-.va-table th {
-  background-color: #000000;
+.appointment-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
 }
 
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.appointment-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.status.SCHEDULED {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status.CANCELLED {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status.COMPLETED {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.btn-update {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.btn-update:hover {
+  background-color: #0056b3;
+}
+
+.no-data {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+@media screen and (max-width: 768px) {
+  .appointment-table {
+    font-size: 14px;
+  }
+
+  .appointment-table th,
+  .appointment-table td {
+    padding: 8px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
 }
 
 .popup-content {
   background: #fff;
-  padding: 20px;
+  padding: 30px;
   border-radius: 8px;
-  max-width: 500px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.popup-content h2 {
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 24px;
+  text-align: center;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-weight: bold;
+}
+
+.form-group input {
   width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #000;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.btn {
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-save {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: #218838;
+}
+
+.btn-cancel {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: #c82333;
 }
 </style>
