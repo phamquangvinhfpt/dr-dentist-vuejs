@@ -64,6 +64,7 @@ const saveClinic = async () => {
     if (selectedClinic.value?.ownerID) {
       // Ensure the clinic object contains all required fields
       const updatedClinic: Clinic = {
+        id: selectedClinic.value.id || '', // Ensure the ID is included
         ownerID: selectedClinic.value.ownerID || '',
         name: selectedClinic.value.name || '',
         address: selectedClinic.value.address || '',
@@ -77,6 +78,7 @@ const saveClinic = async () => {
     } else {
       // Ensure the clinic object contains all required fields for a new clinic
       const newClinic: Clinic = {
+        id: '', // Empty or auto-generated ID for new clinic
         ownerID: '', // Empty or auto-generated ID for new clinic
         name: selectedClinic.value?.name || '',
         address: selectedClinic.value?.address || '',
@@ -106,6 +108,7 @@ const deleteClinic = async (clinicId: string) => {
 
 const addNewClinic = () => {
   selectedClinic.value = {
+    id: '', // Empty or auto-generated ID for new clinic
     ownerID: '',
     name: '',
     address: '',
