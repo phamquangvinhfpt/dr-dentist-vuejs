@@ -5,6 +5,7 @@ export type Dentist = {
   institute: string
   specialization: string
   yearOfExperience: number
+  dentistName?: string
 }
 
 export type EmptyDentist = {

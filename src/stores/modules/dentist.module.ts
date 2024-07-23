@@ -2,12 +2,17 @@ import { Dentist } from '@/pages/dentist/types'
 import dentistService from '@services/dentist.service'
 import { defineStore } from 'pinia'
 export const useDentistStore = defineStore('dentistProfile', {
-  state: () => ({}),
+  state: () => ({
+    dentists: [] as Dentist[],
+    isLoading: false as boolean,
+    error: null as string | null,
+  }),
   actions: {
     async getDentists(): Promise<any> {
       return dentistService
         .getAllDentists()
         .then((response) => {
+          this.dentists = response
           return Promise.resolve(response)
         })
         .catch((error) => {
@@ -28,6 +33,7 @@ export const useDentistStore = defineStore('dentistProfile', {
       return dentistService
         .createDentist(dentist)
         .then((response) => {
+          this.dentists.push(response)
           return Promise.resolve(response)
         })
         .catch((error) => {
@@ -38,6 +44,10 @@ export const useDentistStore = defineStore('dentistProfile', {
       return dentistService
         .updateDentist(id, dentist)
         .then((response) => {
+          const index = this.dentists.findIndex((d) => d.dentistId === dentist.dentistId)
+          if (index !== -1) {
+            this.dentists[index] = dentist
+          }
           return Promise.resolve(response)
         })
         .catch((error) => {
@@ -58,8 +68,8 @@ export const useDentistStore = defineStore('dentistProfile', {
       this.isLoading = true
       this.error = null
       try {
-        const response = await DentistService.getAllDentistDetailsOfClinic(clinicId)
-        this.dentistDetails = response
+        const response = await dentistService.getAllDentistDetailsOfClinic(clinicId)
+        this.dentists = response
       } catch (error) {
         this.error = 'Failed to fetch dentists.'
         console.error('Error fetching dentists:', error)
