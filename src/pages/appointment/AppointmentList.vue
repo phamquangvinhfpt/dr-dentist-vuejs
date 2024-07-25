@@ -138,7 +138,11 @@ const CreateDentalView = (id: string) => {
               </button>
               <span v-else> N/A </span>
               <button
-                v-if="appointment.status === 0 && authStore.hasAccess('DentalRecords.Create')"
+                v-if="
+                  appointment.status === 0 &&
+                  authStore.hasAccess('DentalRecords.Create') &&
+                  authStore.user?.roles === 'Dentist'
+                "
                 class="btn btn-update"
                 @click="CreateDentalView(appointment.id)"
               >
