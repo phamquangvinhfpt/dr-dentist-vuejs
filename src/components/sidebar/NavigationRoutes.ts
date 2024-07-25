@@ -26,6 +26,14 @@ export default {
       displayName: 'menu.clinic',
       meta: {
         icon: 'apartment',
+        permission: 'Clinics.Create',
+      },
+    },
+    {
+      name: 'clinic-profile',
+      displayName: 'menu.clinic',
+      meta: {
+        icon: 'apartment',
         permission: 'Clinics.View',
       },
     },

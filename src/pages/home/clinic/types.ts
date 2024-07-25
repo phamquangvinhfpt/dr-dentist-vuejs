@@ -47,3 +47,8 @@ export interface DentalFilterResponse {
   errors: string | null
   message: string | null
 }
+export interface ClinicRequest {
+  ownerID: string
+  name: string
+  address: string
+}

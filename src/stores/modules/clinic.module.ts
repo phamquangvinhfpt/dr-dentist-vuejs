@@ -1,4 +1,4 @@
-import { Clinic, DentalFilterResponse } from '@/pages/home/clinic/types'
+import { Clinic, ClinicRequest, DentalFilterResponse } from '@/pages/home/clinic/types'
 import ClinicService from '@services/clinic.service'
 import { defineStore } from 'pinia'
 
@@ -18,7 +18,7 @@ export const clinicProfileStore = defineStore('clinicProfile', {
         this.isLoading = false
       }
     },
-    async addClinic(newClinic: Clinic): Promise<any> {
+    async addClinic(newClinic: ClinicRequest): Promise<any> {
       const response: Clinic = await ClinicService.addClinic(newClinic)
       this.clinics.push(response)
     },
