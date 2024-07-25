@@ -25,7 +25,7 @@ export default {
       name: 'clinic-profile-management',
       displayName: 'menu.clinic',
       meta: {
-        icon: 'home_health',
+        icon: 'apartment',
         permission: 'Clinics.View',
       },
     },

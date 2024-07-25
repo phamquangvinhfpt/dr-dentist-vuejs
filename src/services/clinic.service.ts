@@ -12,6 +12,7 @@ class ClinicService {
 
   async updateClinic(updatedClinic: Clinic): Promise<Clinic> {
     const clinicID = updatedClinic.clinicDetails[0].clinicID
+    console.log('Check update', clinicID)
     return apiService.put(`/Clinics/UpdateClinics/${clinicID}`, updatedClinic).then((response) => response.data)
   }
 

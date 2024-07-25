@@ -1,25 +1,110 @@
+<template>
+  <div>
+    <VaDataTable
+      class="my-table va-table--hoverable"
+      :items="modifiedDentalRecords"
+      :columns="columns"
+      :style="{
+        '--va-data-table-thead-background': 'var(--va-background-element)',
+        '--va-data-table-grid-tr-border': '1px solid var(--va-background-border)',
+      }"
+      sticky-header
+    >
+      <template #cell(viewDetails)="{}">
+        <div v-for="clinic in dentalRecords" :key="clinic.ownerID" class="clinic-details">
+          <VaButton
+            preset="secondary"
+            class="w-fit text-xs md:text-sm"
+            size="small"
+            @click="navigateToClinicDetails(clinic.clinicDetails)"
+          >
+            {{ t('View Details') }}
+          </VaButton>
+        </div>
+      </template>
+      <template #cell(edit)="{}">
+        <div v-for="clinic in dentalRecords" :key="clinic.ownerID" class="clinic-details">
+          <VaButton
+            preset="secondary"
+            class="w-fit text-xs md:text-sm"
+            size="small"
+            @click="selectClinicForEdit(clinic)"
+          >
+            {{ t('Edit') }}
+          </VaButton>
+        </div>
+      </template>
+      <template #cell(delete)="{}">
+        <div v-for="clinic in dentalRecords" :key="clinic.ownerID" class="clinic-details">
+          <div v-for="detail in clinic.clinicDetails" :key="detail.clinicID" class="clinic-details">
+            <VaButton
+              preset="secondary"
+              class="w-fit text-xs md:text-sm"
+              size="small"
+              @click="deleteClinic(detail.clinicID)"
+            >
+              {{ t('Delete') }}
+            </VaButton>
+          </div>
+        </div>
+      </template>
+    </VaDataTable>
+
+    <VaButton @click="addNewClinic"> Add Clinic </VaButton>
+    <div v-if="selectedClinic" class="add-detail-form">
+      <h3>{{ selectedClinic.ownerID ? 'Edit Clinic' : 'Add Clinic' }}</h3>
+      <VaForm ref="formRef" class="flex flex-col items-baseline gap-6">
+        <VaInput v-model="userNames[selectedClinic.ownerID]" label="Owner" />
+        <VaInput v-model="selectedClinic.address" label="Address" />
+        <VaInput v-model="selectedClinic.name" label="Name" />
+        <VaInput v-model="selectedClinic.verified" label="Last Name" />
+        <div class="mt-8 flex w-full gap-3 background-element">
+          <VaButton @click="saveClinic"> Save </VaButton>
+          <VaButton @click="clearSelectedClinic"> Cancel </VaButton>
+        </div>
+      </VaForm>
+    </div>
+  </div>
+</template>
+
 <script lang="ts" setup>
 import { clinicProfileStore } from '@modules/clinic.module'
-import { Clinic, DentalFilterResponse } from './types'
-import { onMounted, Ref, ref } from 'vue'
+import { Clinic, DentalFilterResponse, ClinicDetail } from './types'
+import { computed, onMounted, Ref, ref } from 'vue'
 import { useUserProfileStore } from '@/stores/modules/user.module'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const dentalStore = clinicProfileStore()
 const dentalRecords: Ref<Clinic[]> = ref([])
 const dentalRecordsFilter: Ref<DentalFilterResponse | null> = ref(null)
 const selectedClinic: Ref<Clinic | null> = ref(null)
 const userProfileStore = useUserProfileStore()
+const { t } = useI18n()
+const router = useRouter()
+const columns = computed(() => [
+  { key: 'address', label: t('Address') },
+  { key: 'owner', label: t('Owner') },
+  { key: 'verified', label: t('Verified') },
+  { key: 'name', label: t('Name') },
+  { key: 'viewDetails', label: t('View Details') },
+  { key: 'edit', label: t('Edit') },
+  { key: 'delete', label: t('Delete') },
+])
 
 const userNames: Ref<{ [key: string]: string }> = ref({})
+
+const modifiedDentalRecords: Ref<any[]> = ref([])
+
 const getAllDental = async () => {
   try {
     await dentalStore.getAllClinics()
     dentalRecordsFilter.value = {
-      pageNumber: 1, // dummy value
-      pageSize: 10, // dummy value
-      firstPage: '', // dummy value
-      lastPage: '', // dummy value
-      totalPages: 1, // dummy value
+      pageNumber: 1, // giá trị giả
+      pageSize: 10, // giá trị giả
+      firstPage: '', // giá trị giả
+      lastPage: '', // giá trị giả
+      totalPages: 1, // giá trị giả
       totalRecords: dentalStore.clinics.length,
       nextPage: null,
       previousPage: null,
@@ -29,24 +114,46 @@ const getAllDental = async () => {
       message: null,
     }
     dentalRecords.value = dentalRecordsFilter.value.data
-    fetchUserNames()
+    await fetchUserNames()
+    createModifiedDentalRecords()
   } catch (error) {
     console.error('Error fetching dental records:', error)
     dentalRecordsFilter.value = null
   }
 }
+
 const fetchUserNames = async () => {
-  for (const clinic of dentalRecords.value) {
+  const promises = dentalRecords.value.map(async (clinic) => {
     if (clinic.ownerID && !userNames.value[clinic.ownerID]) {
       try {
         await userProfileStore.getUserById(clinic.ownerID)
-        userNames.value[clinic.ownerID] = userProfileStore?.userDetails?.fullName || 'Unknown'
+        userNames.value[clinic.ownerID] = userProfileStore.userDetails?.fullName || 'Unknown'
       } catch (error) {
         console.error('Error fetching user details:', error)
         userNames.value[clinic.ownerID] = 'Unknown'
       }
     }
-  }
+  })
+  await Promise.all(promises)
+}
+
+const createModifiedDentalRecords = () => {
+  modifiedDentalRecords.value = dentalRecords.value.map((record) => ({
+    address: record.address,
+    owner: userNames.value[record.ownerID],
+    verified: record.verified,
+    name: record.name,
+    id: record.ownerID,
+    clinicDetails: record.clinicDetails, // Thêm chi tiết phòng khám
+  }))
+}
+
+const navigateToClinicDetails = (clinicDetail: ClinicDetail[]) => {
+  console.log('check query', clinicDetail)
+  router.push({
+    name: 'clinic-detail',
+    query: { clinicDetail: JSON.stringify(clinicDetail) },
+  })
 }
 
 const selectClinicForEdit = (clinic: Clinic) => {
@@ -62,7 +169,6 @@ const clearSelectedClinic = () => {
 const saveClinic = async () => {
   try {
     if (selectedClinic.value?.ownerID) {
-      // Ensure the clinic object contains all required fields
       const updatedClinic: Clinic = {
         id: selectedClinic.value.id || '', // Ensure the ID is included
         ownerID: selectedClinic.value.ownerID || '',
@@ -71,12 +177,12 @@ const saveClinic = async () => {
         verified: selectedClinic.value.verified || false,
         owner: selectedClinic.value.owner || { status: 0, birthDate: null, gender: 0, address: '', imageUrl: '' },
         createdAt: selectedClinic.value.createdAt || new Date(),
-        updatedAt: new Date(), // Update the date
+        updatedAt: new Date(), // Cập nhật ngày
         clinicDetails: selectedClinic.value.clinicDetails || [],
       }
+      console.log('check update 1', updatedClinic)
       await dentalStore.updateClinic(updatedClinic)
     } else {
-      // Ensure the clinic object contains all required fields for a new clinic
       const newClinic: Clinic = {
         id: '', // Empty or auto-generated ID for new clinic
         ownerID: '', // Empty or auto-generated ID for new clinic
@@ -91,7 +197,7 @@ const saveClinic = async () => {
       await dentalStore.addClinic(newClinic)
     }
     clearSelectedClinic()
-    await getAllDental() // Refresh the list after saving
+    await getAllDental() // Làm mới danh sách sau khi lưu
   } catch (error) {
     console.error('Error saving clinic:', error)
   }
@@ -100,7 +206,7 @@ const saveClinic = async () => {
 const deleteClinic = async (clinicId: string) => {
   try {
     await dentalStore.deleteClinic(clinicId)
-    await getAllDental() // Refresh the list after deletion
+    await getAllDental() // Làm mới danh sách sau khi xóa
   } catch (error) {
     console.error('Error deleting clinic:', error)
   }
@@ -130,115 +236,3 @@ onMounted(() => {
   getAllDental()
 })
 </script>
-
-<template>
-  <div class="clinic-profile">
-    <button class="btn add-clinic-btn" @click="addNewClinic">Add Clinic</button>
-
-    <div v-for="clinic in dentalRecords" :key="clinic.ownerID" class="clinic-details">
-      <p><strong>Address:</strong> {{ clinic.address }}</p>
-      <p><strong>Owner:</strong> {{ userNames[clinic.ownerID] }}</p>
-      <p><strong>Verified:</strong> {{ clinic.verified ? 'Yes' : 'No' }}</p>
-      <p><strong>Name:</strong> {{ clinic.name }}</p>
-
-      <h3>Clinic Details</h3>
-      <ul>
-        <li v-for="detail in clinic.clinicDetails" :key="detail.clinicID">
-          <strong>{{ detail.dayOfTheWeek }}:</strong> {{ detail.openingTime }} - {{ detail.closingTime }} (Slot
-          Duration: {{ detail.slotDuration }} mins, Max Patients per Slot: {{ detail.maxPatientsPerSlot }})
-          <button class="btn" @click="selectClinicForEdit(clinic)">Edit</button>
-          <button class="btn" @click="deleteClinic(detail.clinicID)">Delete</button>
-        </li>
-      </ul>
-    </div>
-
-    <div v-if="selectedClinic" class="add-detail-form">
-      <h3>{{ selectedClinic.ownerID ? 'Edit Clinic' : 'Add Clinic' }}</h3>
-      <label>
-        Owner:
-        <input v-model="userNames[selectedClinic.ownerID]" type="text" />
-      </label>
-      <label>
-        Address:
-        <input v-model="selectedClinic.address" type="text" />
-      </label>
-      <label>
-        Name:
-        <input v-model="selectedClinic.name" type="text" />
-      </label>
-      <label>
-        Verified:
-        <input v-model="selectedClinic.verified" type="checkbox" />
-      </label>
-      <button class="btn" @click="saveClinic">{{ selectedClinic.ownerID ? 'Update' : 'Add' }}</button>
-      <button class="btn" @click="clearSelectedClinic">Cancel</button>
-    </div>
-  </div>
-</template>
-
-<style scoped>
-.clinic-profile {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.clinic-details {
-  border: 1px solid #ddd;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.clinic-details h2 {
-  margin-top: 0;
-}
-
-.clinic-details ul {
-  list-style: none;
-  padding: 0;
-}
-
-.clinic-details li {
-  margin-bottom: 10px;
-}
-
-.add-detail-form {
-  margin-top: 20px;
-}
-
-.add-detail-form label {
-  display: block;
-  margin-bottom: 10px;
-}
-
-.add-detail-form input {
-  display: block;
-  margin-bottom: 10px;
-}
-
-.btn {
-  display: inline-block;
-  padding: 10px 20px;
-  font-size: 16px;
-  color: #fff;
-  background-color: #007bff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.btn:hover {
-  background-color: #0056b3;
-}
-
-.add-clinic-btn {
-  margin-bottom: 20px;
-}
-
-.owner-image {
-  max-width: 150px;
-  border-radius: 50%;
-  margin-top: 10px;
-}
-</style>

@@ -112,6 +112,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../pages/home/clinic/ClinicDashboard.vue'),
       },
       {
+        name: 'clinic-detail',
+        path: '/clinic-detail',
+        meta: {
+          requiresAuth: true,
+        },
+        component: () => import('../pages/home/clinic/ClinicViewDetail.vue'),
+      },
+      {
         name: 'appointments',
         path: 'appointments',
         meta: {
