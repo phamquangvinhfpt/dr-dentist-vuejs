@@ -57,7 +57,7 @@
         <VaInput v-model="userNames[selectedClinic.ownerID]" label="Owner" />
         <VaInput v-model="selectedClinic.address" label="Address" />
         <VaInput v-model="selectedClinic.name" label="Name" />
-        <VaInput v-model="selectedClinic.verified" label="Last Name" />
+        <VaInput :model-value="selectedClinic.verified.toString()" label="Last Name" />
         <div class="mt-8 flex w-full gap-3 background-element">
           <VaButton @click="saveClinic"> Save </VaButton>
           <VaButton @click="clearSelectedClinic"> Cancel </VaButton>

@@ -2,7 +2,7 @@ export interface Clinic {
   id: string
   ownerID: string
   name: string
-  address: string | null
+  address: string
   verified: boolean
   owner: AppUser
   createdAt: Date
