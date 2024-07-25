@@ -48,7 +48,7 @@
           track-by="roleType"
           :text-by="(option: any) => option.name"
           :options="RoleTypeOptions"
-          @update:modelValue="updateUserRole(row.rowData?.roleType, $event)"
+          @update:modelValue="updateUserRole(row.rowData.id, row.rowData.roleType, $event)"
         >
           <template #content="{ value }">
             <VaBadge :text="value.name" :color="RoleTypeColor(value.roleType)" class="mr-2" />
@@ -81,7 +81,14 @@
     </template>
     <template #cell(Permission)="{ row }">
       <div class="flex items-center gap-2 ellipsis max-w-[230px]">
-        <button class="btn btn-detail" @click="viewPermission(row.rowData.id)">Detail</button>
+        <VaButton
+          preset="secondary"
+          class="w-fit text-xs md:text-sm"
+          size="small"
+          @click="viewPermission(row.rowData.id)"
+        >
+          {{ t('auditLogs.table.buttonDetails') }}
+        </VaButton>
       </div>
     </template>
   </VaDataTable>
@@ -242,34 +249,34 @@ const getUsers = async (query: any) => {
     })
 }
 
-const updateUserRole = async (currentRoleType: Roles, newRoleOption: { roleType: number; name: string }) => {
+const updateUserRole = async (
+  userId: string,
+  currentRoleType: Roles,
+  newRoleOption: { roleType: number; name: string },
+) => {
   try {
-    const userToUpdate = users.value.find((user) => user.roleType === currentRoleType)
-    if (userToUpdate) {
-      await UserStore.updateUserRole(userToUpdate.id, newRoleOption.roleType)
-        .then(() => {
-          notify({
-            message: notifications.updatedSuccessfully('role'),
-            color: 'info',
-          })
-          userToUpdate.roleType = newRoleOption.roleType
-          getUsers({
-            pageNumber: pagination.value.pageNumber,
-            pageSize: pagination.value.pageSize,
-          })
-        })
-        .catch((error) => {
-          notify({
-            message: notifications.updateFailed('role') + getErrorMessage(error),
-            color: 'error',
-          })
-        })
-    } else {
-      notify({
-        message: notifications.updateFailed('user'),
-        color: 'error',
-      })
+    console.log('Updating user:', userId)
+    console.log('Current role:', currentRoleType)
+    console.log('New role:', newRoleOption)
+
+    if (currentRoleType === newRoleOption.roleType) {
+      console.log('Role unchanged, no update needed')
+      return
     }
+    await UserStore.updateUserRole(userId, newRoleOption.roleType).then(() => {
+      notify({
+        message: notifications.updatedSuccessfully('role'),
+        color: 'info',
+      })
+      const userIndex = users.value.findIndex((user) => user.id === userId)
+      if (userIndex !== -1) {
+        users.value[userIndex].roleType = newRoleOption.roleType
+      }
+      getUsers({
+        pageNumber: pagination.value.pageNumber,
+        pageSize: pagination.value.pageSize,
+      })
+    })
   } catch (error) {
     notify({
       message: notifications.updateFailed('user') + getErrorMessage(error),
