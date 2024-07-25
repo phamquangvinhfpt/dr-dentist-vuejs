@@ -12,6 +12,12 @@ const fetchAppointments = async () => {
 
 const showPopup = ref(false)
 const selectedAppointment = ref<Appointment | null>(null)
+const showDeleteConfirmation = ref(false)
+const appointmentToDelete = ref<string | null>(null)
+const showUpdateConfirmation = ref(false)
+const showMessage = ref(false)
+const messageText = ref('')
+const messageType = ref('')
 
 const openPopup = (appointment: Appointment) => {
   selectedAppointment.value = appointment
@@ -23,21 +29,62 @@ const closePopup = () => {
   selectedAppointment.value = null
 }
 
+const openDeleteConfirmation = (id: string) => {
+  appointmentToDelete.value = id
+  showDeleteConfirmation.value = true
+}
+
+const closeDeleteConfirmation = () => {
+  showDeleteConfirmation.value = false
+  appointmentToDelete.value = null
+}
+
+const openUpdateConfirmation = () => {
+  showUpdateConfirmation.value = true
+}
+
+const closeUpdateConfirmation = () => {
+  showUpdateConfirmation.value = false
+}
+
+const showMessagePopup = (text: string, type: 'success' | 'error') => {
+  messageText.value = text
+  messageType.value = type
+  showMessage.value = true
+  setTimeout(() => {
+    showMessage.value = false
+  }, 3000)
+}
+
 const updateAppointment = async () => {
   if (selectedAppointment.value) {
     const appointmentRequest: AppointmentRequest = {
-      patientID: selectedAppointment.value.patient.id, // Sửa lại thành patientID
-      dentistID: selectedAppointment.value.dentist.id, // Sửa lại thành dentistID
+      patientID: selectedAppointment.value.patient.id,
+      dentistID: selectedAppointment.value.dentist.id,
       clinicID: selectedAppointment.value.clinicID,
       date: selectedAppointment.value.date,
       timeSlot: selectedAppointment.value.timeSlot,
-      duration: selectedAppointment.value.duration, // Thêm duration
+      duration: selectedAppointment.value.duration,
       type: selectedAppointment.value.type,
       status: selectedAppointment.value.status,
     }
-    await appointmentStore.updateAppointment(selectedAppointment.value.id, appointmentRequest)
+    try {
+      await appointmentStore.updateAppointment(selectedAppointment.value.id, appointmentRequest)
+      fetchAppointments()
+      closePopup()
+      closeUpdateConfirmation()
+      showMessagePopup('Change successful', 'success')
+    } catch (error) {
+      showMessagePopup('Something went wrong, please try again', 'error')
+    }
+  }
+}
+
+const confirmDeleteAppointment = async () => {
+  if (appointmentToDelete.value) {
+    await appointmentStore.deleteAppointment(appointmentToDelete.value)
     fetchAppointments()
-    closePopup()
+    closeDeleteConfirmation()
   }
 }
 
@@ -77,6 +124,7 @@ onMounted(() => {
             </td>
             <td>
               <button class="btn btn-update" @click="openPopup(appointment)">Update</button>
+              <button class="btn btn-delete" @click="openDeleteConfirmation(appointment.id)">Delete</button>
             </td>
           </tr>
           <tr v-if="appointments.length === 0">
@@ -86,17 +134,18 @@ onMounted(() => {
       </table>
     </div>
 
+    <!-- Update Appointment Popup -->
     <div v-if="showPopup && selectedAppointment" class="popup">
       <div class="popup-content">
         <h2>Update Appointment</h2>
         <div class="form-grid">
           <div class="form-group">
             <label for="patient">Patient:</label>
-            <input id="patient" v-model="selectedAppointment.patient.fullName" />
+            <input id="patient" v-model="selectedAppointment.patient.fullName" readonly />
           </div>
           <div class="form-group">
             <label for="dentist">Dentist:</label>
-            <input id="dentist" v-model="selectedAppointment.dentist.fullName" />
+            <input id="dentist" v-model="selectedAppointment.dentist.fullName" readonly />
           </div>
           <div class="form-group">
             <label for="date">Date:</label>
@@ -104,11 +153,11 @@ onMounted(() => {
           </div>
           <div class="form-group">
             <label for="timeSlot">Time Slot:</label>
-            <input id="timeSlot" v-model="selectedAppointment.timeSlot" />
+            <input id="timeSlot" v-model="selectedAppointment.timeSlot" type="time" />
           </div>
           <div class="form-group">
             <label for="duration">Duration:</label>
-            <input id="duration" v-model="selectedAppointment.duration" />
+            <input id="duration" v-model="selectedAppointment.duration" type="number" />
           </div>
           <div class="form-group">
             <label for="type">Type:</label>
@@ -120,10 +169,39 @@ onMounted(() => {
           </div>
         </div>
         <div class="button-group">
-          <button class="btn btn-save" @click="updateAppointment">Save</button>
+          <button class="btn btn-save" @click="openUpdateConfirmation">Save</button>
           <button class="btn btn-cancel" @click="closePopup">Cancel</button>
         </div>
       </div>
+    </div>
+
+    <!-- Update Confirmation Popup -->
+    <div v-if="showUpdateConfirmation" class="popup">
+      <div class="popup-content">
+        <h2>Confirm Update</h2>
+        <p>Are you sure you want to update this appointment?</p>
+        <div class="button-group">
+          <button class="btn btn-update-confirm" @click="updateAppointment">Yes</button>
+          <button class="btn btn-cancel" @click="closeUpdateConfirmation">No</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Popup -->
+    <div v-if="showDeleteConfirmation" class="popup">
+      <div class="popup-content">
+        <h2>Confirm Delete</h2>
+        <p>Are you sure you want to delete this appointment?</p>
+        <div class="button-group">
+          <button class="btn btn-delete-confirm" @click="confirmDeleteAppointment">Yes</button>
+          <button class="btn btn-cancel" @click="closeDeleteConfirmation">No</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message Popup -->
+    <div v-if="showMessage" :class="['message-popup', messageType]">
+      {{ messageText }}
     </div>
   </div>
 </template>
@@ -225,6 +303,21 @@ h1 {
   background-color: #0056b3;
 }
 
+.btn-delete {
+  background-color: #dc3545;
+  color: #fff;
+  margin-left: 5px;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+}
+
+.btn-delete-confirm {
+  background-color: #dc3545;
+  color: #fff;
+}
+
 .no-data {
   text-align: center;
   color: #6c757d;
@@ -247,6 +340,19 @@ h1 {
   }
 }
 
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
 .popup-content {
   background: #fff;
   padding: 30px;
@@ -262,6 +368,13 @@ h1 {
   color: #333;
   font-size: 24px;
   text-align: center;
+}
+
+.popup-content p {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 18px;
+  color: #333;
 }
 
 .form-grid {
@@ -316,11 +429,55 @@ h1 {
 }
 
 .btn-cancel {
-  background-color: #dc3545;
+  background-color: #6c757d;
   color: white;
 }
 
 .btn-cancel:hover {
-  background-color: #c82333;
+  background-color: #5a6268;
+}
+
+.btn-update-confirm {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-update-confirm:hover {
+  background-color: #218838;
+}
+
+.message-popup {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 1000;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+.message-popup.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message-popup.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+@keyframes fadeInOut {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
 }
 </style>
