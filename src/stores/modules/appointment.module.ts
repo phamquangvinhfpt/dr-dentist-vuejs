@@ -9,6 +9,8 @@ interface AppointmentState {
   appointment: Appointment | null
   isLoading: boolean
   error: string | null
+  id: string
+  message: string
 }
 
 export const useAppointmentStore = defineStore('appointment', {
@@ -17,6 +19,8 @@ export const useAppointmentStore = defineStore('appointment', {
     appointment: null,
     isLoading: false,
     error: null,
+    id: '' as string,
+    message: '' as string,
   }),
   actions: {
     async fetchAllAppointments() {
@@ -79,6 +83,16 @@ export const useAppointmentStore = defineStore('appointment', {
       try {
         const response = await AppointmentService.CreateAppointmentForPeriodic(appointmentRequest)
         this.appointments.push(response)
+      } catch (error) {
+        return Promise.reject(error)
+      }
+    },
+    async ChangeStatusAppointment(id: string, status: number): Promise<any> {
+      this.isLoading = true
+      this.error = null
+      try {
+        const response = await AppointmentService.ChangeStatusAppointment(id, status)
+        this.message = response
       } catch (error) {
         return Promise.reject(error)
       }

@@ -342,6 +342,7 @@ onMounted(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  margin: 10px;
 }
 
 .card:hover {

@@ -3,8 +3,10 @@ import { useDentalStore } from '@/stores/modules/dental.module'
 import { ref, reactive, watch, computed, onMounted } from 'vue'
 import { CreateDentalRequest, SettingShowDetail, GetAppointmentForCreateDental } from '../types'
 import { useRouter } from 'vue-router'
+import { useAppointmentStore } from '@stores/modules/appointment.module'
 
 const router = useRouter()
+const appointmentStore = useAppointmentStore()
 const dentalStore = useDentalStore()
 const appointment = ref<GetAppointmentForCreateDental>()
 const isAppointment = ref(true)
@@ -96,7 +98,7 @@ watch(
   { immediate: true },
 )
 onMounted(() => {
-  const id = '2dde2656-1fa2-4f35-0396-08dcabe81658'
+  const id = appointmentStore.id
   getAppointmentForCreateDental(id)
   formData.appointmentID = id
 })

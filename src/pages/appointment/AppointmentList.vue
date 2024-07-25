@@ -1,15 +1,19 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue'
 import { useAppointmentStore } from '@stores/modules/appointment.module'
-import { Appointment, AppointmentRequest } from './types'
+import { Appointment, AppointmentRequest, AppointmentStatus } from './types'
+import { useRouter } from 'vue-router'
+import { useToast } from 'vuestic-ui'
+import { useAuthStore } from '@/stores/modules/auth.module'
 
+const authStore = useAuthStore()
+const { init } = useToast()
 const appointmentStore = useAppointmentStore()
 const appointments = computed<Appointment[]>(() => appointmentStore.appointments)
-
+const router = useRouter()
 const fetchAppointments = async () => {
   await appointmentStore.fetchAllAppointments()
 }
-
 const showPopup = ref(false)
 const selectedAppointment = ref<Appointment | null>(null)
 
@@ -40,10 +44,50 @@ const updateAppointment = async () => {
     closePopup()
   }
 }
-
+const updateAppointmentStatus = async (appointment: Appointment) => {
+  try {
+    await appointmentStore.ChangeStatusAppointment(appointment.id, Number(appointment.status))
+    init({ message: 'Appointment status updated successfully', color: 'success' })
+  } catch (error) {
+    console.error('Error updating appointment status:', error)
+    init({ message: 'Failed to update appointment status', color: 'danger' })
+  }
+}
+const getStatusText = (status: AppointmentStatus): string => {
+  switch (status) {
+    case AppointmentStatus.Scheduled:
+      return 'Scheduled'
+    case AppointmentStatus.Completed:
+      return 'Completed'
+    case AppointmentStatus.Cancelled:
+      return 'Cancelled'
+    case AppointmentStatus.Pending:
+      return 'Pending'
+    default:
+      return 'Unknown'
+  }
+}
+const getStatusClass = (status: AppointmentStatus): string => {
+  switch (status) {
+    case AppointmentStatus.Scheduled:
+      return 'Scheduled'
+    case AppointmentStatus.Completed:
+      return 'Completed'
+    case AppointmentStatus.Cancelled:
+      return 'Cancelled'
+    case AppointmentStatus.Pending:
+      return 'Pending'
+    default:
+      return ''
+  }
+}
 onMounted(() => {
   fetchAppointments()
 })
+const CreateDentalView = (id: string) => {
+  appointmentStore.id = id
+  router.push({ name: 'create' })
+}
 </script>
 
 <template>
@@ -71,12 +115,36 @@ onMounted(() => {
             <td>{{ appointment.date }}</td>
             <td>{{ appointment.type }}</td>
             <td>
-              <span :class="['status', appointment.status]">
-                {{ appointment.status }}
+              <select
+                v-if="appointment.status === AppointmentStatus.Pending && authStore.hasAccess('Appointments.Update')"
+                v-model="appointment.status"
+                @change="updateAppointmentStatus(appointment)"
+              >
+                <option :value="AppointmentStatus.Scheduled">Scheduled</option>
+                <option :value="AppointmentStatus.Cancelled">Cancelled</option>
+                <option :value="AppointmentStatus.Pending">Pending</option>
+              </select>
+              <span v-else :class="['status', getStatusClass(appointment.status)]">
+                {{ getStatusText(appointment.status) }}
               </span>
             </td>
             <td>
-              <button class="btn btn-update" @click="openPopup(appointment)">Update</button>
+              <button
+                v-if="authStore.hasAccess('Appointments.Update')"
+                class="btn btn-update"
+                @click="openPopup(appointment)"
+              >
+                Update
+              </button>
+              <span v-else> N/A </span>
+              <button
+                v-if="appointment.status === 0 && authStore.hasAccess('DentalRecords.Create')"
+                class="btn btn-update"
+                @click="CreateDentalView(appointment.id)"
+              >
+                Create Dental
+              </button>
+              <span v-else> N/A </span>
             </td>
           </tr>
           <tr v-if="appointments.length === 0">

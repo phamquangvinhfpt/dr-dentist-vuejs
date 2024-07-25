@@ -71,6 +71,16 @@ class AppointmentService {
         return Promise.reject(error)
       })
   }
+  async ChangeStatusAppointment(id: string, status: number): Promise<any> {
+    return apiService
+      .get(`/Appoinment/ChangeStatus?appointmentID=${id}&status=${status}`)
+      .then((response) => {
+        return Promise.resolve(response.data)
+      })
+      .catch((error) => {
+        return Promise.reject(error)
+      })
+  }
 }
 
 export default new AppointmentService()
