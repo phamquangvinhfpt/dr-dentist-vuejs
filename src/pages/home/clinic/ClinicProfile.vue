@@ -42,7 +42,7 @@ onMounted(() => {
   <div class="clinic-profile">
     <div v-for="clinic in dentalRecords" :key="clinic.ownerID" class="clinic-details">
       <p><strong>Address:</strong> {{ clinic.address }}</p>
-      <p><strong>Verified:</strong> {{ clinic.verified ? 'Yes' : 'No' }}</p>
+      <p><strong>Verified:</strong> {{ clinic.verified ? 'Hoạt động' : 'Không Hoạt động' }}</p>
       <div v-if="clinic.owner" class="owner-details">
         <h3>Owner Details</h3>
         <p><strong>Status:</strong> {{ clinic.owner.status }}</p>
@@ -58,8 +58,8 @@ onMounted(() => {
       <h3>Clinic Details</h3>
       <ul>
         <li v-for="detail in clinic.clinicDetails" :key="detail.clinicID">
-          <strong>TimeLine:</strong> {{ detail.openingTime }} - {{ detail.closingTime }} (Slot Duration:
-          {{ detail.slotDuration }} mins, Max Patients per Slot: {{ detail.maxPatientsPerSlot }})
+          <strong> {{ detail.dayOfTheWeek }}</strong> {{ detail.openingTime }} - {{ detail.closingTime }} (Slot
+          Duration: {{ detail.slotDuration }} mins, Max Patients per Slot: {{ detail.maxPatientsPerSlot }})
         </li>
       </ul>
     </div>

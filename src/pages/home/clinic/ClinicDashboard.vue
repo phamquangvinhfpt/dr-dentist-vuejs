@@ -21,17 +21,23 @@
         </VaButton>
       </template>
       <template #cell(edit)="{ row }">
-        <VaButton
-          preset="secondary"
-          class="w-fit text-xs md:text-sm"
-          size="small"
-          @click="selectClinicForEdit(row.rowData)"
-        >
-          {{ t('Edit') }}
-        </VaButton>
+        <div v-for="clinic in dentalRecords" :key="clinic.ownerID" class="clinic-details">
+          <div v-if="clinic.id == row.rowData?.id2">
+            <VaButton
+              v-if="authStore.hasAccess('Clinics.Update') && authStore.user?.roles === 'SuperAdmin'"
+              preset="secondary"
+              class="w-fit text-xs md:text-sm"
+              size="small"
+              @click="selectClinicForEdit(clinic)"
+            >
+              {{ t('Edit') }}
+            </VaButton>
+          </div>
+        </div>
       </template>
       <template #cell(delete)="{ row }">
         <VaButton
+          v-if="authStore.hasAccess('Clinics.Update') && authStore.user?.roles === 'SuperAdmin'"
           preset="secondary"
           class="w-fit text-xs md:text-sm"
           size="small"
@@ -42,17 +48,29 @@
       </template>
     </VaDataTable>
 
-    <VaButton @click="addNewClinic"> Add Clinic </VaButton>
+    <VaButton
+      v-if="authStore.hasAccess('Clinics.Create') && authStore.user?.roles === 'ClinicOwner'"
+      @click="addNewClinic"
+    >
+      Add Clinic
+    </VaButton>
+
     <div v-if="selectedClinic" class="add-detail-form">
-      <h3>{{ selectedClinic.name ? 'Edit Clinic' : 'Add Clinic' }}</h3>
       <VaForm ref="formRef" class="flex flex-col items-baseline gap-6">
-        <VaInput v-model="selectedClinic.ownerID" label="Owner" />
+        <VaInput
+          v-if="authStore.hasAccess('Clinics.Update') && authStore.user?.roles === 'SuperAdmin'"
+          v-model="userNames[selectedClinic.ownerID]"
+          label="Owner"
+        />
         <VaInput v-model="selectedClinic.address" label="Address" />
         <VaInput v-model="selectedClinic.name" label="Name" />
         <VaInput
+          v-if="authStore.hasAccess('Clinics.Update') && authStore.user?.roles === 'ClinicOwner'"
+          readonly
           :model-value="selectedClinic.verified !== undefined ? selectedClinic.verified.toString() : ''"
           label="Verify"
         />
+        <VaSelect v-model="selectedClinic.verified" :options="verifiedOptions" label="Verify" />
         <div class="mt-8 flex w-full gap-3 background-element">
           <VaButton @click="saveClinic">Save</VaButton>
           <VaButton @click="clearSelectedClinic">Cancel</VaButton>
@@ -64,12 +82,13 @@
 
 <script lang="ts" setup>
 import { clinicProfileStore } from '@modules/clinic.module'
-import { Clinic, DentalFilterResponse, ClinicDetail } from './types'
+import { Clinic, DentalFilterResponse, ClinicDetail, ClinicRequest } from './types'
 import { computed, onMounted, Ref, ref } from 'vue'
 import { useUserProfileStore } from '@/stores/modules/user.module'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-
+import { useAuthStore } from '@/stores/modules/auth.module'
+const authStore = useAuthStore()
 const dentalStore = clinicProfileStore()
 const dentalRecords: Ref<Clinic[]> = ref([])
 const dentalRecordsFilter: Ref<DentalFilterResponse | null> = ref(null)
@@ -86,7 +105,10 @@ const columns = computed(() => [
   { key: 'edit', label: t('Edit') },
   { key: 'delete', label: t('Delete') },
 ])
-
+const verifiedOptions = [
+  { text: 'True', value: true },
+  { text: 'False', value: false },
+]
 const userNames: Ref<{ [key: string]: string }> = ref({})
 
 const modifiedDentalRecords: Ref<any[]> = ref([])
@@ -95,11 +117,11 @@ const getAllDental = async () => {
   try {
     await dentalStore.getAllClinics()
     dentalRecordsFilter.value = {
-      pageNumber: 1, // giả
-      pageSize: 10, // giả
-      firstPage: '', // giả
-      lastPage: '', // giả
-      totalPages: 1, // giả
+      pageNumber: 1,
+      pageSize: 10,
+      firstPage: '',
+      lastPage: '',
+      totalPages: 1,
       totalRecords: dentalStore.clinics.length,
       nextPage: null,
       previousPage: null,
@@ -139,7 +161,6 @@ const createModifiedDentalRecords = () => {
     owner: userNames.value[record.ownerID],
     verified: record.verified,
     name: record.name,
-    id: record.ownerID,
     clinicDetails: record.clinicDetails,
     edit: record.clinicDetails,
     delete: record.id,
@@ -172,24 +193,19 @@ const saveClinic = async () => {
         ownerID: selectedClinic.value.ownerID || '',
         name: selectedClinic.value.name || '',
         address: selectedClinic.value.address || '',
-        verified: selectedClinic.value.verified || false,
+        verified: true,
         owner: selectedClinic.value.owner || { status: 0, birthDate: null, gender: 0, address: '', imageUrl: '' },
         createdAt: selectedClinic.value.createdAt || new Date(),
         updatedAt: new Date(), // Cập nhật ngày
         clinicDetails: selectedClinic.value.clinicDetails || [],
       }
+
       await dentalStore.updateClinic(updatedClinic)
     } else {
-      const newClinic: Clinic = {
-        id: '', // Empty or auto-generated ID for new clinic
-        ownerID: '', // Empty or auto-generated ID for new clinic
+      const newClinic: ClinicRequest = {
+        ownerID: authStore.user?.id as string, // Empty or auto-generated ID for new clinic
         name: selectedClinic.value?.name || '',
         address: selectedClinic.value?.address || '',
-        verified: selectedClinic.value?.verified || false,
-        owner: selectedClinic.value?.owner || { status: 0, birthDate: null, gender: 0, address: '', imageUrl: '' },
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        clinicDetails: selectedClinic.value?.clinicDetails || [],
       }
       await dentalStore.addClinic(newClinic)
     }
