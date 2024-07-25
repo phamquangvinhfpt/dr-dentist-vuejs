@@ -41,7 +41,12 @@ class DentalService {
   }
   async CreateDental(request: CreateDentalRequest): Promise<any> {
     return apiService
-      .post('/DentalRecord/createDentalRecord', { request })
+      .post('/DentalRecord/createDentalRecord', {
+        appointmentID: request.appointmentID,
+        prescriptionRequests: request.prescriptionRequests,
+        medicalRecordRequest: request.medicalRecordRequest,
+        followUpAppointmentRequest: request.followUpAppointmentRequest,
+      })
       .then((response) => {
         return Promise.resolve(response.data)
       })
