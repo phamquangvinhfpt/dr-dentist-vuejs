@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, Ref, watch, reactive } from 'vue'
-import { VaDataTable, VaSelect } from 'vuestic-ui'
+import { ref, computed, onMounted, Ref, reactive, nextTick } from 'vue'
+import { VaDataTable, VaSelect, useToast } from 'vuestic-ui'
 import { usePermissionStore } from '@/stores/modules/permission.module'
 import { useUserStore } from '@/stores/modules/user.module'
 
+const { init } = useToast()
 const store = usePermissionStore()
 const userStore = useUserStore()
 interface Permission {
   name: string
-  user: boolean
-  dentalRecord: boolean
-  clinic: boolean
-  appointment: boolean
+  Users: boolean
+  DentalRecords: boolean
+  Clinics: boolean
+  Appointments: boolean
 }
 interface options {
   value: boolean
@@ -20,165 +21,127 @@ interface options {
 const data: Ref<string[]> = ref([])
 const columns = computed(() => [
   { key: 'name', label: 'Permission' },
-  { key: 'user', label: 'User' },
-  { key: 'dentalRecord', label: 'Dental Record' },
-  { key: 'clinic', label: 'Clinic' },
-  { key: 'appointment', label: 'Appointment' },
+  { key: 'Users', label: 'User' },
+  { key: 'DentalRecords', label: 'Dental Record' },
+  { key: 'Clinics', label: 'Clinic' },
+  { key: 'Appointments', label: 'Appointment' },
 ])
-
+const addPermissionByUSerID = async (action: string, resource: string) => {
+  const id = userStore.id as string
+  await store.AddPermissionByUserID(id, action, resource).then(() => {
+    init({ message: store.message, color: 'success' })
+  })
+}
+const deletePermissionByUSerID = async (action: string, resource: string) => {
+  const id = userStore.id as string
+  await store.DeletePermissionByUserID(id, action, resource).then(() => {
+    init({ message: store.message, color: 'success' })
+  })
+}
 const getPermissionByUser = async () => {
   const id = userStore.id as string
   const res = await store.GetPermissionByUserID(id)
-  console.log('res', res)
   data.value = res
-  console.log('array - permission', permissions[0]['name'])
+  console.log(data.value)
+  permissions.forEach((permission) => {
+    Object.keys(permission).forEach((key) => {
+      if (key !== 'name') {
+        permission[key as keyof Omit<Permission, 'name'>] = false
+      }
+    })
+  })
   data.value.forEach((item) => {
-    const items = item.split('.') as string[]
-    if (items[2] === 'View') {
-      if (items[1] === 'Users') {
-        permissions[0]['user'] = true
-      } else if (items[1] === 'DentalRecords') {
-        permissions[0]['dentalRecord'] = true
-      } else if (items[1] === 'Clinics') {
-        permissions[0]['clinic'] = true
-      } else if (items[1] === 'Appointments') {
-        permissions[0]['appointment'] = true
-      }
-    } else if (items[2] === 'Create') {
-      if (items[1] === 'Users') {
-        permissions[0]['user'] = true
-      } else if (items[1] === 'DentalRecords') {
-        permissions[0]['dentalRecord'] = true
-      } else if (items[1] === 'Clinics') {
-        permissions[0]['clinic'] = true
-      } else if (items[1] === 'Appointments') {
-        permissions[0]['appointment'] = true
-      }
-    } else if (items[2] === 'Update') {
-      if (items[1] === 'Users') {
-        permissions[0]['user'] = true
-      } else if (items[1] === 'DentalRecords') {
-        permissions[0]['dentalRecord'] = true
-      } else if (items[1] === 'Clinics') {
-        permissions[0]['clinic'] = true
-      } else if (items[1] === 'Appointments') {
-        permissions[0]['appointment'] = true
-      }
-    } else if (items[2] === 'Delete') {
-      if (items[1] === 'Users') {
-        permissions[0]['user'] = true
-      } else if (items[1] === 'DentalRecords') {
-        permissions[0]['dentalRecord'] = true
-      } else if (items[1] === 'Clinics') {
-        permissions[0]['clinic'] = true
-      } else if (items[1] === 'Appointments') {
-        permissions[0]['appointment'] = true
-      }
+    const [, resource, action] = item.split('.') as string[]
+    const permissionIndex = ['View', 'Create', 'Update', 'Delete'].indexOf(action)
+    if (permissionIndex !== -1 && resource in permissions[permissionIndex]) {
+      permissions[permissionIndex][resource as keyof Omit<Permission, 'name'>] = true
     }
   })
+  await nextTick()
 }
 const booleanOptions = reactive<options[]>([
-  { value: true, label: 'true' },
-  { value: false, label: 'false' },
+  { value: true, label: 'True' },
+  { value: false, label: 'False' },
 ])
-const onChange = (permission: string, action: string) => {
-  console.log('permission: ', permission)
-  console.log('action: ', action)
+const onChange = async (column: string, row: string, newValue: boolean) => {
+  const permissionToUpdate = permissions.find((permission) => permission.name === row) as Permission
+  if (permissionToUpdate[column as keyof Permission] !== newValue) {
+    if (newValue === true) {
+      await addPermissionByUSerID(row, column)
+    } else {
+      await deletePermissionByUSerID(row, column)
+    }
+    await getPermissionByUser()
+  }
 }
 const permissions = reactive<Permission[]>([
-  { name: 'View', user: false, dentalRecord: false, clinic: false, appointment: false },
-  { name: 'Create', user: false, dentalRecord: false, clinic: false, appointment: false },
-  { name: 'Update', user: false, dentalRecord: false, clinic: false, appointment: false },
-  { name: 'Delete', user: false, dentalRecord: false, clinic: false, appointment: false },
+  { name: 'View', Users: false, DentalRecords: false, Clinics: false, Appointments: false },
+  { name: 'Create', Users: false, DentalRecords: false, Clinics: false, Appointments: false },
+  { name: 'Update', Users: false, DentalRecords: false, Clinics: false, Appointments: false },
+  { name: 'Delete', Users: false, DentalRecords: false, Clinics: false, Appointments: false },
 ])
-
+const getLabel = (value: boolean) => {
+  return booleanOptions.find((option) => option.value === value)?.label || ''
+}
 onMounted(() => {
   getPermissionByUser()
 })
-
-watch(
-  () => permissions,
-  (newPermissions, oldPermissions) => {
-    for (let i = 0; i < newPermissions.length; i++) {
-      const newPermission = newPermissions[i]
-      const oldPermission = oldPermissions[i]
-
-      if (newPermission.user !== oldPermission.user) {
-        console.log(`Thuộc tính user đã thay đổi từ ${oldPermission.user} thành ${newPermission.user}`)
-      }
-      if (newPermission.dentalRecord !== oldPermission.dentalRecord) {
-        console.log(
-          `Thuộc tính dentalRecord đã thay đổi từ ${oldPermission.dentalRecord} thành ${newPermission.dentalRecord}`,
-        )
-      }
-      if (newPermission.clinic !== oldPermission.clinic) {
-        console.log(`Thuộc tính clinic đã thay đổi từ ${oldPermission.clinic} thành ${newPermission.clinic}`)
-      }
-      if (newPermission.appointment !== oldPermission.appointment) {
-        console.log(
-          `Thuộc tính appointment đã thay đổi từ ${oldPermission.appointment} thành ${newPermission.appointment}`,
-        )
-      }
-    }
-  },
-  { deep: true },
-)
 </script>
 
 <template>
   <div>
-    <VaCard>
-      <VaDataTable
-        class="my-table va-table--hoverable"
-        :items="permissions"
-        :columns="columns"
-        hoverable
-        :disable-client-side-sorting="false"
-        :style="{
-          '--va-data-table-thead-background': 'var(--va-background-element)',
-          '--va-data-table-grid-tr-border': '1px solid var(--va-background-border)',
-        }"
-        sticky-header
-        no-data-html="<div class='text-center'>No data found</div>"
-      >
-        <template #cell(name)="{ value }">
-          <strong>{{ value }}</strong>
-        </template>
-        <template #cell(user)="{ row, column }">
-          <VaSelect
-            v-model="row.rowData[column.key]"
-            :options="booleanOptions.map((option) => option.label)"
-            label-by="label"
-            value-by="value"
-            @c="onChange(column.key, row.rowData['name'])"
-          />
-        </template>
-        <template #cell(dentalRecord)="{ row, column }">
-          <VaSelect
-            v-model="row.rowData[column.key]"
-            :options="booleanOptions.map((option) => option.label)"
-            label-by="label"
-            value-by="value"
-            @change="onChange(column.key, row.rowData['name'])"
-          />
-        </template>
-        <template #cell(clinic)="{ row, column }">
-          <VaSelect
-            v-model="row.rowData[column.key]"
-            :options="booleanOptions.map((option) => option.label)"
-            @change="onChange(column.key, row.rowData['name'])"
-          />
-        </template>
-        <template #cell(appointment)="{ row, column }">
-          <VaSelect
-            v-model="row.rowData[column.key]"
-            :options="booleanOptions.map((option) => option.label)"
-            label-by="label"
-            value-by="value"
-            @change="onChange(column.key, row.rowData['name'])"
-          />
-        </template>
-      </VaDataTable>
-    </VaCard>
+    <VaDataTable
+      class="my-table va-table--hoverable"
+      :items="permissions"
+      :columns="columns"
+      hoverable
+      :disable-client-side-sorting="false"
+      :style="{
+        '--va-data-table-thead-background': 'var(--va-background-element)',
+        '--va-data-table-grid-tr-border': '1px solid var(--va-background-border)',
+      }"
+      sticky-header
+      no-data-html="<div class='text-center'>No data found</div>"
+    >
+      <template #cell(name)="{ value }">
+        <strong>{{ value }}</strong>
+      </template>
+      <template #cell(Users)="{ row, column }">
+        <VaSelect
+          :model-value="getLabel(row.rowData[column.key])"
+          :options="booleanOptions"
+          track-by="value"
+          text-by="label"
+          @update:modelValue="(newValue) => onChange(column.key, row.rowData.name, newValue.value)"
+        />
+      </template>
+      <template #cell(DentalRecords)="{ row, column }">
+        <VaSelect
+          :model-value="getLabel(row.rowData[column.key])"
+          :options="booleanOptions"
+          track-by="value"
+          text-by="label"
+          @update:modelValue="(newValue) => onChange(column.key, row.rowData.name, newValue.value)"
+        />
+      </template>
+      <template #cell(Clinics)="{ row, column }">
+        <VaSelect
+          :model-value="getLabel(row.rowData[column.key])"
+          :options="booleanOptions"
+          track-by="value"
+          text-by="label"
+          @update:modelValue="(newValue) => onChange(column.key, row.rowData.name, newValue.value)"
+        />
+      </template>
+      <template #cell(Appointments)="{ row, column }">
+        <VaSelect
+          :model-value="getLabel(row.rowData[column.key])"
+          :options="booleanOptions"
+          track-by="value"
+          text-by="label"
+          @update:modelValue="(newValue) => onChange(column.key, row.rowData.name, newValue.value)"
+        />
+      </template>
+    </VaDataTable>
   </div>
 </template>

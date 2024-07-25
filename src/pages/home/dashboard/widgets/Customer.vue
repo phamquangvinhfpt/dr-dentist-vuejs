@@ -12,12 +12,12 @@ import { useAppointmentStore } from '@/stores/modules/appointment.module'
 import { PaginationType } from '@/pages/audit-logs/types'
 import { useAuthStore } from '@/stores/modules/auth.module'
 
-const dentalStore = clinicProfileStore()
+const clinicStore = clinicProfileStore()
 const dentistStore = useDentistStore()
 const { init } = useToast()
-const dentalRecords: Ref<any[]> = ref([])
-const dentalRecordsPagination: Ref<Clinic[]> = ref([])
-const dentalRecordsFilter: Ref<DentalFilterResponse | null> = ref(null)
+const clinicItem: Ref<any[]> = ref([])
+const clinicsPagination: Ref<Clinic[]> = ref([])
+const clinicFilter: Ref<DentalFilterResponse | null> = ref(null)
 const userProfileStore = useUserProfileStore()
 const authStore = useAuthStore()
 const page = ref(1)
@@ -32,36 +32,36 @@ const pagination = ref<PaginationType>({
   hasNextPage: false,
 })
 
-const getAllDental = async () => {
+const getAllClinic = async () => {
   try {
-    await dentalStore.getAllClinics()
-    dentalRecords.value = dentalStore.clinics.map((clinic) => ({
+    await clinicStore.getAllClinics()
+    clinicItem.value = clinicStore.clinics.map((clinic) => ({
       ...clinic,
       createdAt: new Date(clinic.createdAt),
       updatedAt: new Date(clinic.updatedAt),
     }))
     await fetchUserNames()
-    pagination.value.totalCount = dentalRecords.value.length
-    pagination.value.totalPages = Math.ceil(dentalRecords.value.length / pagination.value.pageSize)
-    dentalRecordsPagination.value = dentalRecords.value.slice(
+    pagination.value.totalCount = clinicItem.value.length
+    pagination.value.totalPages = Math.ceil(clinicItem.value.length / pagination.value.pageSize)
+    clinicsPagination.value = clinicItem.value.slice(
       (pagination.value.currentPage - 1) * pagination.value.pageSize,
       pagination.value.currentPage * pagination.value.pageSize,
     )
   } catch (error) {
     console.error('Error fetching dental records:', error)
-    dentalRecordsFilter.value = null
+    clinicFilter.value = null
   }
 }
 
 const fetchUserNames = async () => {
-  for (const clinic of dentalRecords.value) {
-    if (clinic.ownerID && !userNames.value[clinic.ownerID]) {
+  for (const item of clinicItem.value) {
+    if (item.ownerID && !userNames.value[item.ownerID]) {
       try {
-        await userProfileStore.getUserById(clinic.ownerID)
-        userNames.value[clinic.ownerID] = userProfileStore?.userDetails?.fullName || 'Unknown'
+        await userProfileStore.getUserById(item.ownerID)
+        userNames.value[item.ownerID] = userProfileStore?.userDetails?.fullName || 'Unknown'
       } catch (error) {
         console.error('Error fetching user details:', error)
-        userNames.value[clinic.ownerID] = 'Unknown'
+        userNames.value[item.ownerID] = 'Unknown'
       }
     }
   }
@@ -71,7 +71,7 @@ const handlePageChange = (newPage: number) => {
   const newCurrentPage = Math.ceil(newPage / pagination.value.pageSize)
   pagination.value.currentPage = newCurrentPage
 
-  getAllDental()
+  getAllClinic()
 }
 
 const showModal = ref(false)
@@ -223,52 +223,41 @@ const options = [
 ]
 
 onMounted(() => {
-  getAllDental()
+  getAllClinic()
 })
 </script>
 <template>
-  <div class="min-h-[80vh]">
-    <div class="flex flex-wrap">
-      <div v-for="clinic in dentalRecordsPagination" :key="clinic.ownerID" class="w-full md:w-1/4 px-4 mb-4">
-        <VaCard class="bg-white rounded-lg shadow-md p-6 flex">
-          <div class="flex flex-col" style="width: 100%">
-            <div class="flex">
-              <div class="flex-1 min-h-[250px]">
-                <h3 class="text-lg font-semibold">{{ clinic.name }}</h3>
-                <p class="text-gray-600">{{ clinic.address || 'No address provided' }}</p>
-                <p class="text-gray-600">Owner: {{ userNames[clinic.ownerID] || 'Unknown' }}</p>
-                <p class="text-gray-600">Verified: {{ clinic.verified ? 'Yes' : 'No' }}</p>
-                <p class="text-gray-600">Created At: {{ new Date(clinic.createdAt).toLocaleDateString() }}</p>
-                <p class="text-gray-600">Updated At: {{ new Date(clinic.updatedAt).toLocaleDateString() }}</p>
-                <div>
-                  <h4 class="font-medium mt-2">Details:</h4>
-                  <ul>
-                    <li v-for="detail in clinic.clinicDetails" :key="detail.clinicID">
-                      <p>{{ detail.dayOfTheWeek }}: {{ detail.openingTime }} - {{ detail.closingTime }}</p>
-                      <p>Slot Duration: {{ detail.slotDuration }} minutes</p>
-                      <p>Max Patients per Slot: {{ detail.maxPatientsPerSlot }}</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div class="ml-4">
-                <img
-                  :src="'https://cdn.iconscout.com/icon/premium/png-256-thumb/clinic-2054876-1730482.png'"
-                  alt="Owner Image"
-                  class="w-24 h-24 rounded-full object-cover"
-                />
-              </div>
+  <section>
+    <div class="container-fluid px-4 px-lg-5 mt-5">
+      <div class="row g-4 clinic-grid">
+        <div v-for="clinic in clinicsPagination" :key="clinic.ownerID" class="col-12 col-sm-6 col-md-4 col-lg-3">
+          <div class="card h-100">
+            <div class="card-img-container">
+              <img
+                class="card-img-top"
+                :src="'https://cdn.iconscout.com/icon/premium/png-256-thumb/clinic-2054876-1730482.png'"
+                alt="Clinic Image"
+              />
             </div>
-            <div>
-              <VaCardActions align="center">
-                <VaButton @click="handleEditClinic(clinic)">Booking</VaButton>
-              </VaCardActions>
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title fw-bold">Name: {{ clinic.name }}</h5>
+              <p class="card-text">
+                <small>
+                  <i class="fas fa-map-marker-alt">Address: </i> {{ clinic.address || 'No address provided' }}
+                </small>
+              </p>
+              <p class="card-text">
+                <small> <i class="fas fa-user"></i> Owner: {{ userNames[clinic.ownerID] || 'Unknown' }} </small>
+              </p>
+            </div>
+            <div class="card-footer text-center bg-transparent border-top-0">
+              <VaButton class="w-100 btn-booking" @click="handleEditClinic(clinic)">Booking</VaButton>
             </div>
           </div>
-        </VaCard>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
   <div v-if="pagination.totalPages > 1" class="mt-4">
     <VaCard class="p-5">
       <VaPagination
@@ -336,3 +325,48 @@ onMounted(() => {
     </template>
   </VaModal>
 </template>
+<style scoped>
+.clinic-grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+.card-img-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-body {
+  flex-grow: 1;
+}
+
+.btn-booking {
+  background-color: #007bff;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-booking:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 575.98px) {
+  .col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+</style>

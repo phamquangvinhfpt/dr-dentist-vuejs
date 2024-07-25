@@ -2,7 +2,9 @@
 import { useDentalStore } from '@/stores/modules/dental.module'
 import { ref, reactive, watch, computed, onMounted } from 'vue'
 import { CreateDentalRequest, SettingShowDetail, GetAppointmentForCreateDental } from '../types'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const dentalStore = useDentalStore()
 const appointment = ref<GetAppointmentForCreateDental>()
 const isAppointment = ref(true)
@@ -43,6 +45,12 @@ const formData = reactive<CreateDentalRequest>({
     reason: '',
   },
 })
+const isScheduledDateValid = computed(() => {
+  const scheduledDate = new Date(formData.followUpAppointmentRequest.scheduledDate)
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return scheduledDate > today
+})
 const isFormValid = computed(() => {
   return (
     formData.appointmentID &&
@@ -51,18 +59,18 @@ const isFormValid = computed(() => {
     formData.medicalRecordRequest.diagnosis &&
     formData.medicalRecordRequest.treatment &&
     formData.followUpAppointmentRequest.scheduledDate &&
-    formData.followUpAppointmentRequest.reason
+    formData.followUpAppointmentRequest.reason &&
+    isScheduledDateValid.value
   )
 })
 const submitForm = async () => {
   dentalStore.isLoading = true
   try {
-    const response = await dentalStore.CreateDental(formData)
-    console.log('Dental record created:', response)
-    // Xử lý khi thành công
+    await dentalStore.CreateDental(formData).then(() => {
+      router.push({ name: 'record-list' })
+    })
   } catch (error) {
     console.error('Failed to create dental record:', error)
-    // Xử lý khi có lỗi
   } finally {
     dentalStore.isLoading = false
   }
@@ -88,8 +96,9 @@ watch(
   { immediate: true },
 )
 onMounted(() => {
-  const id = 'fff46d1a-aba6-4986-45d7-08dca14d1818'
+  const id = '2dde2656-1fa2-4f35-0396-08dcabe81658'
   getAppointmentForCreateDental(id)
+  formData.appointmentID = id
 })
 const formatDate = (dateString: string) => {
   const date = new Date(dateString)
@@ -210,6 +219,7 @@ const getAppointmentStatus = (type: number) => {
               type="datetime-local"
               required
             />
+            <div v-if="!isScheduledDateValid" class="text-red-500 text-sm mt-1">Scheduled date is not valid!</div>
           </VaField>
           <VaField>
             <VaInput v-model="formData.followUpAppointmentRequest.reason" label="Reason" required />

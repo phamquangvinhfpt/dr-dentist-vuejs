@@ -5,6 +5,7 @@ export const usePermissionStore = defineStore('groupPermission', {
     return {
       permissions: [] as string[],
       isLoading: true,
+      message: '' as string,
     }
   },
   actions: {
@@ -23,6 +24,7 @@ export const usePermissionStore = defineStore('groupPermission', {
       try {
         const res = await PermissionService.AddPermissionByUserID(id, action, resource)
         this.isLoading = false
+        this.message = res.data
         return Promise.resolve(res)
       } catch (error) {
         return Promise.reject(error)
@@ -32,6 +34,7 @@ export const usePermissionStore = defineStore('groupPermission', {
       try {
         const res = await PermissionService.DeletePermissionByUserID(id, action, resource)
         this.isLoading = false
+        this.message = res.data
         return Promise.resolve(res)
       } catch (error) {
         return Promise.reject(error)
