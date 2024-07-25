@@ -10,57 +10,52 @@
       }"
       sticky-header
     >
-      <template #cell(viewDetails)="{}">
-        <div v-for="clinic in dentalRecords" :key="clinic.ownerID" class="clinic-details">
-          <VaButton
-            preset="secondary"
-            class="w-fit text-xs md:text-sm"
-            size="small"
-            @click="navigateToClinicDetails(clinic.clinicDetails)"
-          >
-            {{ t('View Details') }}
-          </VaButton>
-        </div>
+      <template #cell(clinicDetails)="{ row }">
+        <VaButton
+          preset="secondary"
+          class="w-fit text-xs md:text-sm"
+          size="small"
+          @click="navigateToClinicDetails(row.rowData)"
+        >
+          {{ t('View Details') }}
+        </VaButton>
       </template>
-      <template #cell(edit)="{}">
-        <div v-for="clinic in dentalRecords" :key="clinic.ownerID" class="clinic-details">
-          <VaButton
-            preset="secondary"
-            class="w-fit text-xs md:text-sm"
-            size="small"
-            @click="selectClinicForEdit(clinic)"
-          >
-            {{ t('Edit') }}
-          </VaButton>
-        </div>
+      <template #cell(edit)="{ row }">
+        <VaButton
+          preset="secondary"
+          class="w-fit text-xs md:text-sm"
+          size="small"
+          @click="selectClinicForEdit(row.rowData)"
+        >
+          {{ t('Edit') }}
+        </VaButton>
       </template>
-      <template #cell(delete)="{}">
-        <div v-for="clinic in dentalRecords" :key="clinic.ownerID" class="clinic-details">
-          <div v-for="detail in clinic.clinicDetails" :key="detail.clinicID" class="clinic-details">
-            <VaButton
-              preset="secondary"
-              class="w-fit text-xs md:text-sm"
-              size="small"
-              @click="deleteClinic(detail.clinicID)"
-            >
-              {{ t('Delete') }}
-            </VaButton>
-          </div>
-        </div>
+      <template #cell(delete)="{ row }">
+        <VaButton
+          preset="secondary"
+          class="w-fit text-xs md:text-sm"
+          size="small"
+          @click="deleteClinic(row.rowData.id2)"
+        >
+          {{ t('Delete') }}
+        </VaButton>
       </template>
     </VaDataTable>
 
     <VaButton @click="addNewClinic"> Add Clinic </VaButton>
     <div v-if="selectedClinic" class="add-detail-form">
-      <h3>{{ selectedClinic.ownerID ? 'Edit Clinic' : 'Add Clinic' }}</h3>
+      <h3>{{ selectedClinic.name ? 'Edit Clinic' : 'Add Clinic' }}</h3>
       <VaForm ref="formRef" class="flex flex-col items-baseline gap-6">
-        <VaInput v-model="userNames[selectedClinic.ownerID]" label="Owner" />
+        <VaInput v-model="selectedClinic.ownerID" label="Owner" />
         <VaInput v-model="selectedClinic.address" label="Address" />
         <VaInput v-model="selectedClinic.name" label="Name" />
-        <VaInput :model-value="selectedClinic.verified.toString()" label="Last Name" />
+        <VaInput
+          :model-value="selectedClinic.verified !== undefined ? selectedClinic.verified.toString() : ''"
+          label="Verify"
+        />
         <div class="mt-8 flex w-full gap-3 background-element">
-          <VaButton @click="saveClinic"> Save </VaButton>
-          <VaButton @click="clearSelectedClinic"> Cancel </VaButton>
+          <VaButton @click="saveClinic">Save</VaButton>
+          <VaButton @click="clearSelectedClinic">Cancel</VaButton>
         </div>
       </VaForm>
     </div>
@@ -87,7 +82,7 @@ const columns = computed(() => [
   { key: 'owner', label: t('Owner') },
   { key: 'verified', label: t('Verified') },
   { key: 'name', label: t('Name') },
-  { key: 'viewDetails', label: t('View Details') },
+  { key: 'clinicDetails', label: t('View Details') },
   { key: 'edit', label: t('Edit') },
   { key: 'delete', label: t('Delete') },
 ])
@@ -100,11 +95,11 @@ const getAllDental = async () => {
   try {
     await dentalStore.getAllClinics()
     dentalRecordsFilter.value = {
-      pageNumber: 1, // giá trị giả
-      pageSize: 10, // giá trị giả
-      firstPage: '', // giá trị giả
-      lastPage: '', // giá trị giả
-      totalPages: 1, // giá trị giả
+      pageNumber: 1, // giả
+      pageSize: 10, // giả
+      firstPage: '', // giả
+      lastPage: '', // giả
+      totalPages: 1, // giả
       totalRecords: dentalStore.clinics.length,
       nextPage: null,
       previousPage: null,
@@ -139,17 +134,20 @@ const fetchUserNames = async () => {
 
 const createModifiedDentalRecords = () => {
   modifiedDentalRecords.value = dentalRecords.value.map((record) => ({
+    id2: record.id,
     address: record.address,
     owner: userNames.value[record.ownerID],
     verified: record.verified,
     name: record.name,
     id: record.ownerID,
-    clinicDetails: record.clinicDetails, // Thêm chi tiết phòng khám
+    clinicDetails: record.clinicDetails,
+    edit: record.clinicDetails,
+    delete: record.id,
   }))
 }
 
 const navigateToClinicDetails = (clinicDetail: ClinicDetail[]) => {
-  console.log('check query', clinicDetail)
+  console.log('dental', clinicDetail)
   router.push({
     name: 'clinic-detail',
     query: { clinicDetail: JSON.stringify(clinicDetail) },
@@ -180,7 +178,6 @@ const saveClinic = async () => {
         updatedAt: new Date(), // Cập nhật ngày
         clinicDetails: selectedClinic.value.clinicDetails || [],
       }
-      console.log('check update 1', updatedClinic)
       await dentalStore.updateClinic(updatedClinic)
     } else {
       const newClinic: Clinic = {

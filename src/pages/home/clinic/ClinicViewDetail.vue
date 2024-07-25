@@ -12,7 +12,7 @@
         </ul>
       </div>
     </div>
-    <p v-else>Loading...</p>
+    <p v-else>No Calendar</p>
   </div>
 </template>
 
@@ -27,7 +27,8 @@ onMounted(() => {
   const clinicDetailsQuery = route.query.clinicDetail
   if (clinicDetailsQuery) {
     try {
-      clinicDetails.value = JSON.parse(clinicDetailsQuery)
+      const parsedData = JSON.parse(clinicDetailsQuery)
+      clinicDetails.value = parsedData.clinicDetails || []
       console.log('Parsed clinicDetails:', clinicDetails.value)
     } catch (e) {
       console.error('Failed to parse clinicDetails:', e)
@@ -35,6 +36,7 @@ onMounted(() => {
   }
 })
 </script>
+
 <style scoped>
 .clinic-details-container {
   max-width: 800px;
