@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue'
 import { useAppointmentStore } from '@stores/modules/appointment.module'
-import { Appointment, AppointmentRequest, AppointmentStatus } from './types'
+import { Appointment, AppointmentRequest, AppointmentStatus, AppointmentType } from './types'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vuestic-ui'
 import { useAuthStore } from '@/stores/modules/auth.module'
@@ -47,6 +47,7 @@ const updateAppointment = async () => {
 const updateAppointmentStatus = async (appointment: Appointment) => {
   try {
     await appointmentStore.ChangeStatusAppointment(appointment.id, Number(appointment.status))
+    await fetchAppointments()
     init({ message: 'Appointment status updated successfully', color: 'success' })
   } catch (error) {
     console.error('Error updating appointment status:', error)
@@ -77,6 +78,20 @@ const getStatusClass = (status: AppointmentStatus): string => {
       return 'Cancelled'
     case AppointmentStatus.Pending:
       return 'Pending'
+    default:
+      return ''
+  }
+}
+const getType = (type: AppointmentType): string => {
+  switch (type) {
+    case AppointmentType.Examination:
+      return 'Examination'
+    case AppointmentType.Treatment:
+      return 'Treatment'
+    case AppointmentType.Reexamination:
+      return 'Reexamination'
+    case AppointmentType.Periodic:
+      return 'Periodic'
     default:
       return ''
   }
@@ -113,7 +128,7 @@ const CreateDentalView = (id: string) => {
             <td>{{ appointment.patient.fullName }}</td>
             <td>{{ appointment.dentist.fullName }}</td>
             <td>{{ appointment.date }}</td>
-            <td>{{ appointment.type }}</td>
+            <td>{{ getType(appointment.type) }}</td>
             <td>
               <select
                 v-if="appointment.status === AppointmentStatus.Pending && authStore.hasAccess('Appointments.Update')"

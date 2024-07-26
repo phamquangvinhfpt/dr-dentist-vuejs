@@ -308,7 +308,7 @@ onMounted(() => {
         <VaDateInput v-model="bookingForm.date" label="Day" />
         <VaInput
           v-model="bookingForm.duration"
-          label="Duration (minutes)"
+          label="Duration (Days)"
           type="number"
           placeholder="Enter duration in minutes"
           required
