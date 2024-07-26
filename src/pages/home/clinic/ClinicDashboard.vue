@@ -70,7 +70,7 @@
           :model-value="selectedClinic.verified !== undefined ? selectedClinic.verified.toString() : ''"
           label="Verify"
         />
-        <VaSelect v-model="selectedClinic.verified" :options="verifiedOptions" label="Verify" />
+        <VaSelect v-else v-model="selectedClinic.verified" :options="verifiedOptions" label="Verify" />
         <div class="mt-8 flex w-full gap-3 background-element">
           <VaButton @click="saveClinic">Save</VaButton>
           <VaButton @click="clearSelectedClinic">Cancel</VaButton>
